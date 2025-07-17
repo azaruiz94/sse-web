@@ -18,6 +18,19 @@ export const fetchStates = createAsyncThunk(
   }
 );
 
+// Fetch state by ID
+export const fetchStateById = createAsyncThunk(
+  'states/fetchById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/states/${id}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 // Create state
 export const createState = createAsyncThunk(
   'states/create',
@@ -38,32 +51,49 @@ const statesSlice = createSlice({
     total: 0,
     page: 0,
     loading: false,
-    error: null
+    error: null,
+    selectedState: null
   },
   reducers: {},
   extraReducers: builder => {
     builder
-    // Fetch
-    .addCase(fetchStates.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(fetchStates.fulfilled, (state, action) => {
-      state.loading = false;
-      state.list = action.payload.states;
-      state.total = action.payload.total;
-      state.page = action.payload.page;
-    })
-    .addCase(fetchStates.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    })
+      // Fetch
+      .addCase(fetchStates.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchStates.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload.states;
+        state.total = action.payload.total;
+        state.page = action.payload.page;
+      })
+      .addCase(fetchStates.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    // Create
-    .addCase(createState.fulfilled, (state, action) => {
-      state.list.unshift(action.payload);
-      state.total += 1;
-    });
+      // Fetch by ID
+      .addCase(fetchStateById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.selectedState = null;
+      })
+      .addCase(fetchStateById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedState = action.payload;
+      })
+      .addCase(fetchStateById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.selectedState = null;
+      })
+
+      // Create
+      .addCase(createState.fulfilled, (state, action) => {
+        state.list.unshift(action.payload);
+        state.total += 1;
+      });
   }
 });
 

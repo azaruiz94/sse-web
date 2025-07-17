@@ -9,7 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchUsers,
   deleteUser,
-  searchUsers
+  searchUsers,
+  fetchUserById
 } from '../../store/slices/usersSlice';
 import { fetchRoles } from '../../store/slices/rolesSlice';
 import { fetchDependencies } from '../../store/slices/dependencies';
@@ -24,7 +25,6 @@ import {
 } from '@ant-design/icons';
 import IconButton from '@mui/material/IconButton';
 import { useSnackbar } from 'notistack';
-import api from '../../utils/axios';
 import {
   Card,
   CardContent,
@@ -45,6 +45,7 @@ const UsersTable = forwardRef((props, ref) => {
   const page = useSelector((state) => state.users.page);
   const loading = useSelector((state) => state.users.loading);
   const authUser = useSelector((state) => state.auth.user);
+  const selectedUser = useSelector((state) => state.users.selectedUser);
 
   // Permission checks
   const hasVerRol = authUser?.permissions?.includes('VER_ROL');
@@ -66,7 +67,6 @@ const UsersTable = forwardRef((props, ref) => {
     }
   }, [dispatch, page, hasVerUsuario]);
 
-  const [selectedUser, setSelectedUser] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -76,14 +76,9 @@ const UsersTable = forwardRef((props, ref) => {
   const [userToDelete, setUserToDelete] = useState(null);
 
   const handleShow = useCallback(async (id) => {
-    try {
-      const res = await api.get(`/users/${id}`);
-      setSelectedUser(res.data);
-      setModalOpen(true);
-    } catch (error) {
-      console.error('Error fetching user:', error);
-    }
-  }, []);
+    await dispatch(fetchUserById(id));
+    setModalOpen(true);
+  }, [dispatch]);
 
   const handleEdit = (row) => {
     setEditingUser(row);

@@ -18,6 +18,19 @@ export const fetchRoles = createAsyncThunk(
   }
 );
 
+// Fetch role by ID
+export const fetchRoleById = createAsyncThunk(
+  'roles/fetchById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/roles/${id}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 // Create role
 export const createRole = createAsyncThunk(
   'roles/create',
@@ -30,7 +43,6 @@ export const createRole = createAsyncThunk(
     }
   }
 );
-
 
 // Update role
 export const updateRole = createAsyncThunk(
@@ -52,7 +64,8 @@ const rolesSlice = createSlice({
     total: 0,
     page: 0,
     loading: false,
-    error: null
+    error: null,
+    selectedRole: null
   },
   reducers: {},
   extraReducers: builder => {
@@ -71,6 +84,22 @@ const rolesSlice = createSlice({
       .addCase(fetchRoles.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Fetch by ID
+      .addCase(fetchRoleById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.selectedRole = null;
+      })
+      .addCase(fetchRoleById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedRole = action.payload;
+      })
+      .addCase(fetchRoleById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.selectedRole = null;
       })
 
       // Create

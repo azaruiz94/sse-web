@@ -62,7 +62,7 @@ const templatesSlice = createSlice({
     error: null,
     page: 1,
     totalPages: 1,
-    totalElements: 0 // <-- add this line
+    totalElements: 0
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -119,8 +119,8 @@ const templatesSlice = createSlice({
       })
       .addCase(fetchTemplatesByPage.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = action.payload.resolutionTemplates || []; // <-- fix here
-        state.totalElements = action.payload.totalElements || 0; // <-- fix here
+        state.list = action.payload.resolutionTemplates || [];
+        state.totalElements = action.payload.totalElements || 0;
         state.page = action.payload.page || 1;
         state.totalPages = action.payload.totalPages || 1;
       })

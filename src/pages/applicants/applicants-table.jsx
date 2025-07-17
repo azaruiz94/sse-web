@@ -7,6 +7,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchApplicants,
+  fetchApplicantById,
   deleteApplicant,
   searchApplicants
 } from '../../store/slices/applicantsSlice';
@@ -21,7 +22,6 @@ import ShowApplicantModal from './show-applicant-modal';
 import EditApplicantModal from './edit-applicant-modal';
 import DeleteApplicantModal from './delete-applicant-modal';
 import { useSnackbar } from 'notistack';
-import api from '../../utils/axios';
 import {
   Card,
   CardContent,
@@ -38,25 +38,18 @@ const ApplicantsTable = forwardRef((props, ref) => {
   const total = useSelector((state) => state.applicants.total);
   const page = useSelector((state) => state.applicants.page);
   const loading = useSelector((state) => state.applicants.loading);
+  const selectedApplicant = useSelector((state) => state.applicants.selectedApplicant);
 
-  const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingApplicant, setEditingApplicant] = useState(null);
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [applicantToDelete, setApplicantToDelete] = useState(null);
 
   const handleShow = useCallback(async (id) => {
-    try {
-      const res = await api.get(`/applicants/${id}`);
-      setSelectedApplicant(res.data);
-      setModalOpen(true);
-    } catch (error) {
-      console.error('Error fetching applicant:', error);
-    }
-  }, []);
+    await dispatch(fetchApplicantById(id));
+    setModalOpen(true);
+  }, [dispatch]);
 
   const handleEdit = (row) => {
     setEditingApplicant(row);
@@ -107,17 +100,17 @@ const ApplicantsTable = forwardRef((props, ref) => {
   ];
 
   useImperativeHandle(ref, () => ({
-  refresh: () => {
-    dispatch(fetchApplicants(page));
-  },
-  searchApplicants: (term) => {
-    if (term.trim()) {
-      dispatch(searchApplicants({ term, page: 0 }));
-    } else {
-      dispatch(fetchApplicants(0)); // fallback to full list
+    refresh: () => {
+      dispatch(fetchApplicants(page));
+    },
+    searchApplicants: (term) => {
+      if (term.trim()) {
+        dispatch(searchApplicants({ term, page: 0 }));
+      } else {
+        dispatch(fetchApplicants(0)); // fallback to full list
+      }
     }
-  }
-}));
+  }));
 
   return (
     <Card>

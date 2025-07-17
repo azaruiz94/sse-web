@@ -18,6 +18,19 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
+// Fetch user by ID
+export const fetchUserById = createAsyncThunk(
+  'users/fetchById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/users/${id}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 // Create user
 export const createUser = createAsyncThunk(
   'users/create',
@@ -77,7 +90,8 @@ const usersSlice = createSlice({
     total: 0,
     page: 0,
     loading: false,
-    error: null
+    error: null,
+    selectedUser: null
   },
   reducers: {},
   extraReducers: builder => {
@@ -98,6 +112,22 @@ const usersSlice = createSlice({
         state.error = action.payload;
       })
 
+      // Fetch by ID
+      .addCase(fetchUserById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.selectedUser = null;
+      })
+      .addCase(fetchUserById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedUser = action.payload;
+      })
+      .addCase(fetchUserById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.selectedUser = null;
+      })
+
       // Create
       .addCase(createUser.fulfilled, (state, action) => {
         state.list.unshift(action.payload);
@@ -110,6 +140,12 @@ const usersSlice = createSlice({
         if (index !== -1) {
           state.list[index] = action.payload;
         }
+      })
+
+      // Delete
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.list = state.list.filter(u => u.id !== action.payload);
+        state.total -= 1;
       })
 
       // Search

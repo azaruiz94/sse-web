@@ -70,6 +70,19 @@ export const searchApplicants = createAsyncThunk(
   }
 );
 
+// Fetch applicant by ID
+export const fetchApplicantById = createAsyncThunk(
+  'applicants/fetchById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/applicants/${id}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 const applicantsSlice = createSlice({
   name: 'applicants',
   initialState: {
@@ -77,7 +90,8 @@ const applicantsSlice = createSlice({
     total: 0,
     page: 0,
     loading: false,
-    error: null
+    error: null,
+    selectedApplicant: null
   },
   reducers: {},
   extraReducers: builder => {
@@ -96,6 +110,22 @@ const applicantsSlice = createSlice({
       .addCase(fetchApplicants.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Fetch by ID
+      .addCase(fetchApplicantById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.selectedApplicant = null;
+      })
+      .addCase(fetchApplicantById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedApplicant = action.payload;
+      })
+      .addCase(fetchApplicantById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.selectedApplicant = null;
       })
 
       // Create

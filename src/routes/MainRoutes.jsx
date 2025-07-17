@@ -26,6 +26,7 @@ const StatesPage = Loadable(lazy(() => import('pages/states/states-page')));
 const DependenciesPage = Loadable(lazy(() => import('pages/dependencies/dependencies-page')));
 const UsersPage = Loadable(lazy(() => import('pages/users/users-page')));
 const RolesPage = Loadable(lazy(() => import('pages/roles/roles-page')));
+const RecordsPage = Loadable(lazy(() => import('pages/records/records-page')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -74,6 +75,14 @@ const MainRoutes = {
       element: (
         <PrivateRoute permission="VER_SOLICITANTE">
           <ApplicantsPage />
+        </PrivateRoute>
+      )
+    },
+    {
+      path: 'expedientes',
+      element: (
+        <PrivateRoute permission="VER_EXPEDIENTE">
+          <RecordsPage />
         </PrivateRoute>
       )
     },

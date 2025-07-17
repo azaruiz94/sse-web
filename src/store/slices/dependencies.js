@@ -18,6 +18,19 @@ export const fetchDependencies = createAsyncThunk(
   }
 );
 
+// Fetch dependency by ID
+export const fetchDependencyById = createAsyncThunk(
+  'dependencies/fetchById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/dependencies/${id}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 // Create dependency
 export const createDependency = createAsyncThunk(
   'dependencies/create',
@@ -38,7 +51,8 @@ const dependenciesSlice = createSlice({
     total: 0,
     page: 0,
     loading: false,
-    error: null
+    error: null,
+    selectedDependency: null
   },
   reducers: {},
   extraReducers: builder => {
@@ -57,6 +71,22 @@ const dependenciesSlice = createSlice({
       .addCase(fetchDependencies.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Fetch by ID
+      .addCase(fetchDependencyById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.selectedDependency = null;
+      })
+      .addCase(fetchDependencyById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedDependency = action.payload;
+      })
+      .addCase(fetchDependencyById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.selectedDependency = null;
       })
 
       // Create

@@ -35,14 +35,30 @@ const getSystemMenu = (permissions = []) => {
       title: 'Solicitantes',
       type: 'item',
       url: '/solicitantes',
-      icon: icons.DashboardOutlined,
+      icon: icons.BarsOutlined,
+      breadcrumbs: false
+    },
+    permissions.includes('VER_EXPEDIENTE') && {
+      id: 'expedientes',
+      title: 'Expedientes',
+      type: 'item',
+      url: '/expedientes',
+      icon: icons.BarsOutlined,
       breadcrumbs: false
     },
     permissions.includes('VER_RESOLUCION') && {
       id: 'templates',
-      title: 'templates',
+      title: 'Templates',
       type: 'item',
       url: '/templates',
+      icon: icons.BarsOutlined,
+      breadcrumbs: false
+    },
+    permissions.includes('VER_RESOLUCION') && {
+      id: 'resoluciones',
+      title: 'Resoluciones',
+      type: 'item',
+      url: '/resoluciones',
       icon: icons.BarsOutlined,
       breadcrumbs: false
     }

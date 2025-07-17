@@ -6,11 +6,10 @@ import {
   useEffect
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRoles } from '../../store/slices/rolesSlice';
+import { fetchRoles, fetchRoleById } from '../../store/slices/rolesSlice';
 import { DataGrid } from '@mui/x-data-grid';
 import { EyeOutlined, EditOutlined } from '@ant-design/icons';
 import IconButton from '@mui/material/IconButton';
-import api from '../../utils/axios';
 import {
   Card,
   CardContent,
@@ -28,22 +27,16 @@ const RolesTable = forwardRef((props, ref) => {
   const total = useSelector((state) => state.roles.total);
   const page = useSelector((state) => state.roles.page);
   const loading = useSelector((state) => state.roles.loading);
+  const selectedRole = useSelector((state) => state.roles.selectedRole);
 
-  const [selectedRole, setSelectedRole] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
 
   const handleShow = useCallback(async (id) => {
-    try {
-      const res = await api.get(`/roles/${id}`);
-      setSelectedRole(res.data);
-      setModalOpen(true);
-    } catch (error) {
-      console.error('Error fetching role:', error);
-    }
-  }, []);
+    await dispatch(fetchRoleById(id));
+    setModalOpen(true);
+  }, [dispatch]);
 
   const handleEdit = (row) => {
     setEditingRole(row);
