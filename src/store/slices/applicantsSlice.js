@@ -91,7 +91,8 @@ const applicantsSlice = createSlice({
     page: 0,
     loading: false,
     error: null,
-    selectedApplicant: null
+    selectedApplicant: null,
+    selectedApplicantLoading: false
   },
   reducers: {},
   extraReducers: builder => {
@@ -114,17 +115,14 @@ const applicantsSlice = createSlice({
 
       // Fetch by ID
       .addCase(fetchApplicantById.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.selectedApplicant = null;
+        state.selectedApplicantLoading = true;
       })
       .addCase(fetchApplicantById.fulfilled, (state, action) => {
-        state.loading = false;
+        state.selectedApplicantLoading = false;
         state.selectedApplicant = action.payload;
       })
       .addCase(fetchApplicantById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.selectedApplicantLoading = false;
         state.selectedApplicant = null;
       })
 

@@ -49,8 +49,8 @@ const DependenciesTable = forwardRef((props, ref) => {
               paginationMode="server"
               rowCount={total}
               loading={loading}
-              pageSizeOptions={[5]}
-              paginationModel={{ page, pageSize: 5 }}
+              pageSizeOptions={[50]}
+              paginationModel={{ page, pageSize: 50 }}
               onPaginationModelChange={({ page: newPage }) => {
                 dispatch(fetchDependencies(newPage));
               }}

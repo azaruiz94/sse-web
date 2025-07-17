@@ -91,7 +91,8 @@ const usersSlice = createSlice({
     page: 0,
     loading: false,
     error: null,
-    selectedUser: null
+    selectedUser: null,
+    selectedUserLoading: false // <-- Add separate loading for single user
   },
   reducers: {},
   extraReducers: builder => {
@@ -112,18 +113,18 @@ const usersSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Fetch by ID
+      // Fetch by ID (use separate loading state)
       .addCase(fetchUserById.pending, (state) => {
-        state.loading = true;
+        state.selectedUserLoading = true;
         state.error = null;
         state.selectedUser = null;
       })
       .addCase(fetchUserById.fulfilled, (state, action) => {
-        state.loading = false;
+        state.selectedUserLoading = false;
         state.selectedUser = action.payload;
       })
       .addCase(fetchUserById.rejected, (state, action) => {
-        state.loading = false;
+        state.selectedUserLoading = false;
         state.error = action.payload;
         state.selectedUser = null;
       })
