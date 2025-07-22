@@ -26,7 +26,8 @@ export const fetchMe = createAsyncThunk(
       });
       return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
+      // This ensures the error message is passed to the rejected action
+      return rejectWithValue(err.message || err.response?.data?.message);
     }
   }
 );
@@ -38,7 +39,8 @@ const authSlice = createSlice({
     token: token || null,
     loading: false,
     error: null,
-    rehydrated: !!token // true if token already existed
+    rehydrated: !!token,
+    serverDown: false
   },
   reducers: {
     logout: (state) => {
@@ -87,9 +89,21 @@ const authSlice = createSlice({
       })
       .addCase(fetchMe.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
-        state.user = null;
-        localStorage.removeItem('authUser');
+        const errorMsg = action.error?.message || action.payload || '';
+        if (
+          errorMsg.includes('ERR_CONNECTION_REFUSED') ||
+          errorMsg.includes('Network Error') ||
+          errorMsg.includes('Failed to fetch')
+        ) {
+          state.error = 'No se pudo conectar con el servidor. Por favor, intente más tarde.';
+          state.serverDown = true;
+        } else {
+          state.error = action.payload;
+          state.serverDown = false;
+          state.user = null;
+          localStorage.removeItem('authUser');
+          localStorage.removeItem('authToken');
+        }
       });
   },
 });
