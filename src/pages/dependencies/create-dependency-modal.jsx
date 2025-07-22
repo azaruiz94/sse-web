@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useDispatch } from 'react-redux';
-import { createDependency } from '../../store/slices/dependencies';
+import { createDependency } from '../../store/slices/dependenciesSlice';
 
 const CreateDependencyModal = ({ open, onClose }) => {
   const { enqueueSnackbar } = useSnackbar();

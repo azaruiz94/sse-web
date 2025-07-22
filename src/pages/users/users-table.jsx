@@ -13,7 +13,7 @@ import {
   fetchUserById
 } from '../../store/slices/usersSlice';
 import { fetchRoles } from '../../store/slices/rolesSlice';
-import { fetchDependencies } from '../../store/slices/dependencies';
+import { fetchDependencies } from '../../store/slices/dependenciesSlice';
 import ShowUserModal from './show-user-modal';
 import EditUserModal from './edit-user-modal';
 import DeleteUserModal from './delete-user-modal';

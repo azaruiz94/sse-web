@@ -40,6 +40,20 @@ export const fetchRecordById = createAsyncThunk(
   }
 );
 
+// Async thunk for fetching the next record number
+export const fetchNextRecordNumber = createAsyncThunk(
+  'records/fetchNextRecordNumber',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/records/next-number');
+      // Make sure the backend returns { number: ... }
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const recordsSlice = createSlice({
   name: 'records',
   initialState: {
@@ -48,6 +62,7 @@ const recordsSlice = createSlice({
     loading: false,
     error: null,
     selectedRecord: null,
+    nextRecordNumber: null,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -90,6 +105,19 @@ const recordsSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.selectedRecord = null;
+      })
+      .addCase(fetchNextRecordNumber.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchNextRecordNumber.fulfilled, (state, action) => {
+        state.loading = false;
+        state.nextRecordNumber = action.payload.number;
+      })
+      .addCase(fetchNextRecordNumber.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.nextRecordNumber = null;
       });
   },
 });

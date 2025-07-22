@@ -27,6 +27,7 @@ const DependenciesPage = Loadable(lazy(() => import('pages/dependencies/dependen
 const UsersPage = Loadable(lazy(() => import('pages/users/users-page')));
 const RolesPage = Loadable(lazy(() => import('pages/roles/roles-page')));
 const RecordsPage = Loadable(lazy(() => import('pages/records/records-page')));
+const CreateRecordPage = Loadable(lazy(() => import('pages/records/create-record-page')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -83,6 +84,14 @@ const MainRoutes = {
       element: (
         <PrivateRoute permission="VER_EXPEDIENTE">
           <RecordsPage />
+        </PrivateRoute>
+      )
+    },
+    {
+      path: 'expedientes/create',
+      element: (
+        <PrivateRoute permission="CREAR_EXPEDIENTE">
+          <CreateRecordPage />
         </PrivateRoute>
       )
     },

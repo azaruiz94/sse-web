@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchRecordsByPage } from 'store/slices/recordsSlice';
 import { fetchApplicants } from 'store/slices/applicantsSlice';
 import { fetchStates } from 'store/slices/statesSlice';
-import { fetchDependencies } from 'store/slices/dependencies';
+import { fetchDependencies } from 'store/slices/dependenciesSlice';
 import { DataGrid } from '@mui/x-data-grid';
 import {
   Card,

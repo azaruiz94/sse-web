@@ -2,7 +2,7 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import applicantsReducer from './slices/applicantsSlice';
 import statesReducer from './slices/statesSlice';
-import dependenciesReducer from './slices/dependencies';
+import dependenciesReducer from './slices/dependenciesSlice';
 import usersReducer from './slices/usersSlice';
 import rolesReducer from './slices/rolesSlice';
 import permissionsReducer from './slices/permissionsSlice';
