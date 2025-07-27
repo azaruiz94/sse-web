@@ -1,16 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { fetchRecordById } from "store/slices/recordsSlice";
+import { fetchRecordById, forwardRecord } from "store/slices/recordsSlice";
 import { fetchDependencies } from "store/slices/dependenciesSlice";
 import { fetchStates } from "store/slices/statesSlice";
 import { fetchApplicants } from "store/slices/applicantsSlice";
 import { fetchUsers } from "store/slices/usersSlice";
-import { Box, Typography, Paper, Grid, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, RadioGroup, FormControlLabel, Radio, FormLabel, FormControl } from "@mui/material";
+import { Box, Typography, Paper, Grid, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, RadioGroup, FormControlLabel, Radio, FormLabel, FormControl, Button } from "@mui/material";
+import { useSnackbar } from "notistack";
+import ForwardRecordModal from "./forward-record-modal";
 
 const ShowRecordPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
   const record = useSelector((state) => state.records.selectedRecord);
   const loading = useSelector((state) => state.records.loading);
 
@@ -19,6 +22,10 @@ const ShowRecordPage = () => {
   const states = useSelector((state) => state.states.list);
   const applicants = useSelector((state) => state.applicants.list);
   const users = useSelector((state) => state.users.list);
+
+  // Modal state
+  const [forwardModalOpen, setForwardModalOpen] = useState(false);
+  const [forwardLoading, setForwardLoading] = useState(false);
 
   // Helper functions
   const getDependencyName = (depId) => {
@@ -66,15 +73,40 @@ const ShowRecordPage = () => {
     );
   }
 
+  // Handle forward submit
+  const handleForwardSubmit = async (payload) => {
+    setForwardLoading(true);
+    try {
+      await dispatch(forwardRecord(payload)).unwrap();
+      enqueueSnackbar("Expediente reenviado correctamente", { variant: "success" });
+      setForwardModalOpen(false);
+      // Optionally refetch the record to update history
+      dispatch(fetchRecordById(record.id));
+    } catch (err) {
+      enqueueSnackbar("Error al reenviar expediente", { variant: "error" });
+    } finally {
+      setForwardLoading(false);
+    }
+  };
+
   return (
     <Box maxWidth={1200} mx="auto" mt={4}>
       <Paper sx={{ p: 4 }}>
+        <Box display="flex" justifyContent="flex-end" mb={2}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => setForwardModalOpen(true)}
+          >
+            Reenviar expediente
+          </Button>
+        </Box>
         <Typography variant="h5" gutterBottom>
           Record Details
         </Typography>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, md: 8 }}>
-                <TextField
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, md: 8 }}>
+            <TextField
               label="Solicitante"
               value={getApplicantName(record.applicantId)}
               fullWidth
@@ -118,7 +150,6 @@ const ShowRecordPage = () => {
               margin="dense"
             />
           </Grid>
-          
           <Grid size={{ xs: 12, md: 4 }}>
             <TextField
               label="File Path"
@@ -156,7 +187,6 @@ const ShowRecordPage = () => {
               </RadioGroup>
             </FormControl>
           </Grid>
-          
         </Grid>
         {Array.isArray(record.recordHistory) && record.recordHistory.length > 0 && (
           <Box mt={4}>
@@ -194,6 +224,15 @@ const ShowRecordPage = () => {
           </Box>
         )}
       </Paper>
+      <ForwardRecordModal
+        open={forwardModalOpen}
+        onClose={() => setForwardModalOpen(false)}
+        onSubmit={handleForwardSubmit}
+        record={record}
+        dependencies={dependencies}
+        states={states}
+        loading={forwardLoading}
+      />
     </Box>
   );
 };

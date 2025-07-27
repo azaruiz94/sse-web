@@ -54,6 +54,19 @@ export const fetchNextRecordNumber = createAsyncThunk(
   }
 );
 
+// Async thunk for forwarding a record
+export const forwardRecord = createAsyncThunk(
+  'records/forwardRecord',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await api.put('/records/forward', payload);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const recordsSlice = createSlice({
   name: 'records',
   initialState: {
@@ -118,6 +131,24 @@ const recordsSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.nextRecordNumber = null;
+      })
+      .addCase(forwardRecord.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(forwardRecord.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally update selectedRecord if the backend returns the updated record
+        state.selectedRecord = action.payload;
+        // Optionally update the record in the records list
+        const idx = state.records.findIndex(r => r.id === action.payload.id);
+        if (idx !== -1) {
+          state.records[idx] = action.payload;
+        }
+      })
+      .addCase(forwardRecord.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
