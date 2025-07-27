@@ -56,11 +56,11 @@ const RecordsTable = forwardRef((props, ref) => {
   }, [dispatch]);
 
   const handleShow = useCallback((id) => {
-    navigate(`/records/${id}`);
+    navigate(`/expedientes/${id}`);
   }, [navigate]);
 
   const handleEdit = useCallback((row) => {
-    navigate(`/records/${row.id}/edit`);
+    navigate(`/expedientes/${row.id}/edit`);
   }, [navigate]);
 
   const columns = [
