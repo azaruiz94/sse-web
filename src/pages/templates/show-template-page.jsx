@@ -25,7 +25,7 @@ export default function ShowTemplatePage() {
   }
 
   return (
-    <Box maxWidth={800} mx="auto" mt={4}>
+    <Box maxWidth={800} mx="auto" mt={4} sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 4 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h4">
@@ -40,37 +40,15 @@ export default function ShowTemplatePage() {
           </Button>
         </Stack>
         <Box mt={3}>
-          <Typography variant="h6" gutterBottom>Visto</Typography>
+          <Typography variant="h6" gutterBottom>Contenido</Typography>
           <Box
             sx={{
               border: '1px solid #bdbdbd',
               borderRadius: 1,
               p: 2,
-              mb: 3,
-              background: '#fff' // white background
+              background: '#fff'
             }}
-            dangerouslySetInnerHTML={{ __html: template.seen }}
-          />
-          <Typography variant="h6" gutterBottom>Considerando</Typography>
-          <Box
-            sx={{
-              border: '1px solid #bdbdbd',
-              borderRadius: 1,
-              p: 2,
-              mb: 3,
-              background: '#fff' // white background
-            }}
-            dangerouslySetInnerHTML={{ __html: template.considering }}
-          />
-          <Typography variant="h6" gutterBottom>Resuelve</Typography>
-          <Box
-            sx={{
-              border: '1px solid #bdbdbd',
-              borderRadius: 1,
-              p: 2,
-              background: '#fff' // white background
-            }}
-            dangerouslySetInnerHTML={{ __html: template.resolve }}
+            dangerouslySetInnerHTML={{ __html: template.content }}
           />
         </Box>
       </Paper>

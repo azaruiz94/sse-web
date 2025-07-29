@@ -16,9 +16,7 @@ export default function EditTemplatePage() {
   const [form, setForm] = useState({
     id: '',
     name: '',
-    seen: '',
-    considering: '',
-    resolve: ''
+    content: ''
   });
 
   useEffect(() => {
@@ -32,9 +30,7 @@ export default function EditTemplatePage() {
       setForm({
         id: template.id,
         name: template.name || '',
-        seen: template.seen || '',
-        considering: template.considering || '',
-        resolve: template.resolve || ''
+        content: template.content || ''
       });
     }
   }, [template]);
@@ -47,10 +43,10 @@ export default function EditTemplatePage() {
     }));
   };
 
-  const handleCKChange = (name, event, editor) => {
+  const handleCKChange = (event, editor) => {
     setForm(prev => ({
       ...prev,
-      [name]: editor.getData()
+      content: editor.getData()
     }));
   };
 
@@ -74,7 +70,7 @@ export default function EditTemplatePage() {
   }
 
   return (
-    <Box maxWidth={700} mx="auto" mt={4}>
+    <Box maxWidth={1200} mx="auto" mt={4} sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom>
           Editar Plantilla de Resolución
@@ -91,32 +87,12 @@ export default function EditTemplatePage() {
             />
             <div>
               <Typography variant="subtitle1" gutterBottom>
-                Visto
+                Contenido
               </Typography>
               <CKEditor
                 editor={ClassicEditor}
-                data={form.seen}
-                onChange={(event, editor) => handleCKChange('seen', event, editor)}
-              />
-            </div>
-            <div>
-              <Typography variant="subtitle1" gutterBottom>
-                Considerando
-              </Typography>
-              <CKEditor
-                editor={ClassicEditor}
-                data={form.considering}
-                onChange={(event, editor) => handleCKChange('considering', event, editor)}
-              />
-            </div>
-            <div>
-              <Typography variant="subtitle1" gutterBottom>
-                Resuelve
-              </Typography>
-              <CKEditor
-                editor={ClassicEditor}
-                data={form.resolve}
-                onChange={(event, editor) => handleCKChange('resolve', event, editor)}
+                data={form.content}
+                onChange={handleCKChange}
               />
             </div>
             <Box display="flex" justifyContent="flex-end" gap={2}>
