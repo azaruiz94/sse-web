@@ -207,17 +207,19 @@ const ShowRecordPage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {record.recordHistory.map((history) => (
-                    <TableRow key={history.id}>
-                      <TableCell>{new Date(history.updatedDate).toLocaleString()}</TableCell>
-                      <TableCell>{getDependencyName(history.previousDependencyId)}</TableCell>
-                      <TableCell>{getDependencyName(history.nextDependencyId)}</TableCell>
-                      <TableCell>{getStateName(history.previousStateId)}</TableCell>
-                      <TableCell>{getStateName(history.nextStateId)}</TableCell>
-                      <TableCell>{getUserName(history.userId)}</TableCell>
-                      <TableCell>{history.comment}</TableCell>
-                    </TableRow>
-                  ))}
+                  {[...record.recordHistory]
+                    .sort((a, b) => new Date(b.updatedDate) - new Date(a.updatedDate))
+                    .map((history) => (
+                      <TableRow key={history.id}>
+                        <TableCell>{new Date(history.updatedDate).toLocaleString()}</TableCell>
+                        <TableCell>{getDependencyName(history.previousDependencyId)}</TableCell>
+                        <TableCell>{getDependencyName(history.nextDependencyId)}</TableCell>
+                        <TableCell>{getStateName(history.previousStateId)}</TableCell>
+                        <TableCell>{getStateName(history.nextStateId)}</TableCell>
+                        <TableCell>{getUserName(history.userId)}</TableCell>
+                        <TableCell>{history.comment}</TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </TableContainer>
