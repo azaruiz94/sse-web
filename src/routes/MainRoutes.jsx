@@ -29,6 +29,9 @@ const RolesPage = Loadable(lazy(() => import('pages/roles/roles-page')));
 const RecordsPage = Loadable(lazy(() => import('pages/records/records-page')));
 const CreateRecordPage = Loadable(lazy(() => import('pages/records/create-record-page')));
 const ShowRecordPage = Loadable(lazy(() => import('pages/records/show-record-page')));
+const ResolutionsPage = Loadable(lazy(() => import('pages/resolutions/resolutions-page')));
+const CreateResolutionPage = Loadable(lazy(() => import('pages/resolutions/create-resolutions-page')));
+const ShowResolutionPage = Loadable(lazy(() => import('pages/resolutions/show-resolution-page')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -105,26 +108,34 @@ const MainRoutes = {
       )
     },
     {
+      path: 'resoluciones',
+      element: (
+        <PrivateRoute permission="VER_RESOLUCION">
+          <ResolutionsPage />
+        </PrivateRoute>
+      )
+    },
+    {
+      path: 'resoluciones/create',
+      element: (
+        <PrivateRoute permission="CREAR_RESOLUCION">
+          <CreateResolutionPage />
+        </PrivateRoute>
+      )
+    },
+    {
+      path: 'resoluciones/:id',
+      element: (
+        <PrivateRoute permission="VER_RESOLUCION">
+          <ShowResolutionPage />
+        </PrivateRoute>
+      )
+    },
+    {
       path: 'templates',
       element: (
         <PrivateRoute permission="VER_RESOLUCION">
           <TemplatesPage />
-        </PrivateRoute>
-      )
-    },
-    {
-      path: 'templates/create',
-      element: (
-        <PrivateRoute permission="CREAR_RESOLUCION">
-          <CreateTemplatePage />
-        </PrivateRoute>
-      )
-    },
-    {
-      path: 'templates/:id',
-      element: (
-        <PrivateRoute permission="VER_RESOLUCION">
-          <ShowTemplatePage />
         </PrivateRoute>
       )
     },

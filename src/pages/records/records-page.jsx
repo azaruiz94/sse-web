@@ -1,7 +1,6 @@
 import { Box, Button } from '@mui/material';
 import { PlusOutlined } from '@ant-design/icons';
 import { useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 // project imports

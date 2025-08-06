@@ -90,7 +90,19 @@ const authSlice = createSlice({
       .addCase(fetchMe.rejected, (state, action) => {
         state.loading = false;
         const errorMsg = action.error?.message || action.payload || '';
+        // Check for JWT expired error from backend
         if (
+          (typeof action.payload === 'string' && action.payload.includes('expired')) ||
+          (typeof action.payload === 'object' && action.payload?.description?.includes('expired')) ||
+          errorMsg.includes('expired')
+        ) {
+          state.error = 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.';
+          state.serverDown = false;
+          state.user = null;
+          state.token = null;
+          localStorage.removeItem('authUser');
+          localStorage.removeItem('authToken');
+        } else if (
           errorMsg.includes('ERR_CONNECTION_REFUSED') ||
           errorMsg.includes('Network Error') ||
           errorMsg.includes('Failed to fetch')
@@ -101,6 +113,7 @@ const authSlice = createSlice({
           state.error = action.payload;
           state.serverDown = false;
           state.user = null;
+          state.token = null;
           localStorage.removeItem('authUser');
           localStorage.removeItem('authToken');
         }
