@@ -40,6 +40,18 @@ export const fetchResolutionsByPage = createAsyncThunk(
   }
 );
 
+export const updateResolution = createAsyncThunk(
+  'resolutions/updateResolution',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`${API_BASE}`, payload);
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
 // Slice
 const resolutionsSlice = createSlice({
   name: 'resolutions',
@@ -90,6 +102,27 @@ const resolutionsSlice = createSlice({
         state.totalElements = action.payload.totalElements || 0;
       })
       .addCase(fetchResolutionsByPage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update
+      .addCase(updateResolution.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateResolution.fulfilled, (state, action) => {
+        state.loading = false;
+        // Update the current resolution if it's the one being edited
+        if (state.current && state.current.id === action.payload.id) {
+          state.current = action.payload;
+        }
+        // Optionally update the list as well
+        const idx = state.list.findIndex(r => r.id === action.payload.id);
+        if (idx !== -1) {
+          state.list[idx] = action.payload;
+        }
+      })
+      .addCase(updateResolution.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

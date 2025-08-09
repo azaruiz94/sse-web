@@ -1,26 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchRecordById, forwardRecord } from "store/slices/recordsSlice";
 import { fetchDependencies } from "store/slices/dependenciesSlice";
 import { fetchStates } from "store/slices/statesSlice";
-import { fetchApplicants } from "store/slices/applicantsSlice";
 import { fetchUsers } from "store/slices/usersSlice";
-import { Box, Typography, Paper, Grid, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, RadioGroup, FormControlLabel, Radio, FormLabel, FormControl, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  CircularProgress,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormLabel,
+  FormControl,
+  Button
+} from "@mui/material";
 import { useSnackbar } from "notistack";
 import ForwardRecordModal from "./forward-record-modal";
 
 const ShowRecordPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const record = useSelector((state) => state.records.selectedRecord);
   const loading = useSelector((state) => state.records.loading);
 
-  // Get dependencies, states, and applicants from redux
+  // Get dependencies, states, and users from redux
   const dependencies = useSelector((state) => state.dependencies.list);
   const states = useSelector((state) => state.states.list);
-  const applicants = useSelector((state) => state.applicants.list);
   const users = useSelector((state) => state.users.list);
 
   // Modal state
@@ -36,13 +54,9 @@ const ShowRecordPage = () => {
     const state = states.find((s) => s.id === stateId);
     return state ? state.name : stateId;
   };
-  const getApplicantName = (applicantId) => {
-    const applicant = applicants.find((a) => a.id === applicantId);
-    return applicant ? applicant.names : applicantId;
-  };
   const getUserName = (userId) => {
     const user = users.find((u) => u.id === userId);
-    return user ? `${user.firstName} ${user.lastName}` : userId;
+    return user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : userId;
   };
 
   useEffect(() => {
@@ -54,7 +68,6 @@ const ShowRecordPage = () => {
   useEffect(() => {
     if (dependencies.length === 0) dispatch(fetchDependencies());
     if (states.length === 0) dispatch(fetchStates());
-    if (applicants.length === 0) dispatch(fetchApplicants());
     if (users.length === 0) dispatch(fetchUsers());
   }, []); // Only run once on mount
 
@@ -63,7 +76,6 @@ const ShowRecordPage = () => {
     !record ||
     dependencies.length === 0 ||
     states.length === 0 ||
-    applicants.length === 0 ||
     users.length === 0
   ) {
     return (
@@ -89,10 +101,22 @@ const ShowRecordPage = () => {
     }
   };
 
+  // --- NEW: Handle resolve button click ---
+  const handleResolveClick = () => {
+    navigate('/resoluciones/create', { state: { recordNumber: record.number } });
+  };
+
   return (
     <Box maxWidth={1200} mx="auto" mt={4}>
       <Paper sx={{ p: 4 }}>
-        <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Box display="flex" justifyContent="flex-end" mb={2} gap={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleResolveClick}
+          >
+            Generar resolución
+          </Button>
           <Button
             variant="contained"
             color="secondary"
@@ -108,7 +132,11 @@ const ShowRecordPage = () => {
           <Grid size={{ xs: 12, md: 8 }}>
             <TextField
               label="Solicitante"
-              value={getApplicantName(record.applicantId)}
+              value={
+                record.applicant
+                  ? `${record.applicant.names || ''} (${record.applicant.document || ''})`
+                  : ''
+              }
               fullWidth
               InputProps={{ readOnly: true }}
               margin="dense"
@@ -150,7 +178,7 @@ const ShowRecordPage = () => {
               margin="dense"
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <TextField
               label="File Path"
               value={record.filePath}

@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchResolutionById } from 'store/slices/resolutionsSlice';
 import MainCard from 'components/MainCard';
-import { Box, Typography, Button, CircularProgress, Paper } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Paper, Chip } from '@mui/material';
+import { CheckOutlined, EditOutlined } from '@ant-design/icons';
 
 export default function ShowResolutionPage() {
   const { id } = useParams();
@@ -20,10 +21,56 @@ export default function ShowResolutionPage() {
 
   return (
     <MainCard title="Resolution Details">
-      <Paper sx={{ p: 3, maxWidth: 700, mx: 'auto' }}>
-        <Button variant="outlined" onClick={() => navigate('/resoluciones')} sx={{ mb: 2 }}>
-          Back to Resolutions
-        </Button>
+      <Paper sx={{ p: 3, maxWidth: 700, mx: 'auto', position: 'relative' }}>
+        
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/resoluciones')}
+            sx={{ mb: 2 }}
+          >
+            Back to Resolutions
+          </Button>
+          {resolution && !resolution.resolved && (
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mb: 2 }}
+              onClick={() => navigate(`/resoluciones/${resolution.id}/edit`)}
+            >
+              Editar resolución
+            </Button>
+          )}
+        </Box>
+        {/* Tag/Chip for draft or resolved */}
+        {resolution && (
+          <Box display="flex" flexDirection="row" justifyContent="flex-end" alignItems="center" mb={2}>
+            <Chip
+              label={
+                <Box display="flex" alignItems="center" gap={0.5}>
+                  {resolution.resolved ? (
+                    <CheckOutlined style={{ fontSize: 16, marginRight: 4 }} />
+                  ) : (
+                    <EditOutlined style={{ fontSize: 16, marginRight: 4 }} />
+                  )}
+                  {resolution.resolved ? "Resuelto" : "Borrador"}
+                </Box>
+              }
+              size="small"
+              sx={{
+                bgcolor: (theme) =>
+                  resolution.resolved
+                    ? theme.palette.success.lighter
+                    : theme.palette.warning.lighter,
+                color: (theme) =>
+                  resolution.resolved
+                    ? theme.palette.success.dark
+                    : theme.palette.warning.dark,
+                fontSize: 14,
+              }}
+            />
+          </Box>
+        )}
         {loading ? (
           <Box display="flex" justifyContent="center" mt={4}>
             <CircularProgress />
@@ -40,13 +87,17 @@ export default function ShowResolutionPage() {
               {resolution.issuedDate ? new Date(resolution.issuedDate).toLocaleString() : ''}
             </Typography>
             <Typography variant="body2" gutterBottom>
-              <strong>File Path:</strong> {resolution.filePath}
+              <strong>File Path:</strong> {resolution.filePath ?? 'N/A'}
             </Typography>
             <Typography variant="body2" gutterBottom>
-              <strong>Resolved by Dean:</strong> {resolution.resolvedByDean ? 'Yes' : 'No'}
+              <strong>Resuelto por:</strong>{" "}
+              {resolution.resolvedByDean ? "Decano" : "Consejo Directivo"}
             </Typography>
             <Typography variant="body2" gutterBottom>
-              <strong>Record ID:</strong> {resolution.recordId ?? 'N/A'}
+              <strong>Expediente:</strong>{" "}
+              {resolution.recordSummary
+                ? `#${resolution.recordSummary.number} - ${resolution.recordSummary.applicantNames || ''} (Documento: ${resolution.recordSummary.applicantDocument || ''})`
+                : 'N/A'}
             </Typography>
             <Box mt={2}>
               <Typography variant="subtitle1" gutterBottom>

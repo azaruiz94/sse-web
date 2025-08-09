@@ -14,6 +14,7 @@ import {
   CircularProgress,
   Box,
   IconButton,
+  Chip
 } from '@mui/material';
 import { EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -51,9 +52,41 @@ const ResolutionsTable = forwardRef((props, ref) => {
     },
     {
       field: 'resolvedByDean',
-      headerName: 'Resolved by Dean',
+      headerName: 'Resuelto por:',
       width: 160,
-      valueGetter: (params) => (params.value ? 'Yes' : 'No')
+      valueGetter: (params) => (params ? 'Decano' : 'Consejo Directivo')
+    },
+    {
+      field: 'resolved',
+      headerName: 'Estado',
+      width: 120,
+      sortable: false,
+      renderCell: (params) =>
+        params.value ? (
+          <Chip
+            label="Resuelto"
+            size="small"
+            sx={{
+              bgcolor: (theme) => theme.palette.success.lighter,
+              color: (theme) => theme.palette.success.dark,
+              fontWeight: 'bold',
+              fontSize: 13,
+              pointerEvents: 'none'
+            }}
+          />
+        ) : (
+          <Chip
+            label="Borrador"
+            size="small"
+            sx={{
+              bgcolor: (theme) => theme.palette.warning.lighter,
+              color: (theme) => theme.palette.warning.dark,
+              fontWeight: 'bold',
+              fontSize: 13,
+              pointerEvents: 'none'
+            }}
+          />
+        )
     },
     {
       field: 'actions',

@@ -35,7 +35,6 @@ const RecordsTable = forwardRef((props, ref) => {
   const [page, setPage] = useState(0);
   const [pageSize] = useState(5);
 
-  const applicants = useSelector((state) => state.applicants.list);
   const states = useSelector((state) => state.states.list);
   const dependencies = useSelector((state) => state.dependencies.list);
 
@@ -66,12 +65,16 @@ const RecordsTable = forwardRef((props, ref) => {
   const columns = [
     { field: 'number', headerName: 'Number', width: 120 },
     {
-      field: 'applicantId',
+      field: 'applicant',
       headerName: 'Applicant',
-      width: 150,
+      width: 200,
       valueGetter: (params) => {
-        const applicant = applicants.find(a => a.id === params);
-        return applicant ? applicant.names : params;
+        // params.row.applicant is expected to be present in the record
+        const applicant = params;
+        if (applicant) {
+          return `${applicant.names || ''} (${applicant.document || ''})`;
+        }
+        return '';
       }
     },
     {

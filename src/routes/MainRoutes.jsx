@@ -32,6 +32,7 @@ const ShowRecordPage = Loadable(lazy(() => import('pages/records/show-record-pag
 const ResolutionsPage = Loadable(lazy(() => import('pages/resolutions/resolutions-page')));
 const CreateResolutionPage = Loadable(lazy(() => import('pages/resolutions/create-resolutions-page')));
 const ShowResolutionPage = Loadable(lazy(() => import('pages/resolutions/show-resolution-page')));
+const EditResolutionPage = Loadable(lazy(() => import('pages/resolutions/edit-resolution-page')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -132,10 +133,34 @@ const MainRoutes = {
       )
     },
     {
+      path: 'resoluciones/:id/edit',
+      element: (
+        <PrivateRoute permission="EDITAR_RESOLUCION">
+          <EditResolutionPage />
+        </PrivateRoute>
+      )
+    },
+    {
       path: 'templates',
       element: (
         <PrivateRoute permission="VER_RESOLUCION">
           <TemplatesPage />
+        </PrivateRoute>
+      )
+    },
+    {
+      path: 'templates/create',
+      element: (
+        <PrivateRoute permission="CREAR_RESOLUCION">
+          <CreateTemplatePage />
+        </PrivateRoute>
+      )
+    },
+    {
+      path: 'templates/:id',
+      element: (
+        <PrivateRoute permission="VER_RESOLUCION">
+          <ShowTemplatePage />
         </PrivateRoute>
       )
     },

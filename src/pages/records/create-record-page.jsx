@@ -96,7 +96,7 @@ export default function CreateRecordPage() {
       <Paper sx={{ p: 4 }}>
         <Typography variant="h5" mb={2}>Nuevo Expediente</Typography>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid item size={{ xs: 12, md: 8 }}>
             <Autocomplete
               options={applicants}
               getOptionLabel={(option) => option.names || ''}
@@ -123,16 +123,15 @@ export default function CreateRecordPage() {
               )}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item size={{ xs: 12, md: 4 }}>
             <TextField
               label="Número"
               value={number}
               margin="normal"
               fullWidth
-              InputProps={{ readOnly: true }}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid item size={{ xs: 12, md: 8 }}>
             <TextField
               label="Motivo de solicitud/nota"
               value={motive}
@@ -142,7 +141,7 @@ export default function CreateRecordPage() {
               margin="normal"
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item size={{ xs: 12, md: 4 }}>
             <TextField
               label="Ruta del archivo"
               value={filePath}
@@ -152,7 +151,7 @@ export default function CreateRecordPage() {
               required
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item size={{ xs: 12, md: 4 }}>
             <TextField
               label="Estado"
               value={recibidoState ? recibidoState.name : ''}
@@ -161,7 +160,7 @@ export default function CreateRecordPage() {
               disabled
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item size={{ xs: 12, md: 4 }}>
             <TextField
               label="Dependencia"
               value={mesaEntradaDep ? mesaEntradaDep.name : ''}
@@ -170,7 +169,7 @@ export default function CreateRecordPage() {
               disabled
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 12 }}>
+          <Grid item size={{ xs: 12, md: 12 }}>
             <FormControl component="fieldset" margin="dense" fullWidth>
               <FormLabel component="legend">Tipo de expediente</FormLabel>
               <RadioGroup

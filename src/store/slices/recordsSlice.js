@@ -67,6 +67,19 @@ export const forwardRecord = createAsyncThunk(
   }
 );
 
+// Async thunk for searching records
+export const searchRecords = createAsyncThunk(
+  'records/searchRecords',
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/records/search', params);
+      return response.data.records || [];
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const recordsSlice = createSlice({
   name: 'records',
   initialState: {
@@ -76,6 +89,8 @@ const recordsSlice = createSlice({
     error: null,
     selectedRecord: null,
     nextRecordNumber: null,
+    searchResults: [],
+    searchLoading: false,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -149,6 +164,20 @@ const recordsSlice = createSlice({
       .addCase(forwardRecord.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(searchRecords.pending, (state) => {
+        state.searchLoading = true;
+        state.error = null;
+        state.searchResults = [];
+      })
+      .addCase(searchRecords.fulfilled, (state, action) => {
+        state.searchLoading = false;
+        state.searchResults = action.payload;
+      })
+      .addCase(searchRecords.rejected, (state, action) => {
+        state.searchLoading = false;
+        state.error = action.payload;
+        state.searchResults = [];
       });
   },
 });

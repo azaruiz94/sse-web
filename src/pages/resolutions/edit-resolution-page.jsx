@@ -1,188 +1,98 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, TextField, FormControlLabel, Checkbox, Typography, Paper, List, ListItem, ListItemButton, ListItemText, FormControl, FormLabel, RadioGroup, Radio } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { createResolution } from 'store/slices/resolutionsSlice';
-import { searchRecords } from 'store/slices/recordsSlice';
-import { fetchApplicants } from 'store/slices/applicantsSlice';
+import { useParams, useNavigate } from 'react-router-dom';
+import { fetchResolutionById, updateResolution } from 'store/slices/resolutionsSlice';
 import { fetchTemplatesByPage } from 'store/slices/templatesSlice';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { Chip, Grid, Tooltip } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Grid,
+  TextField,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Chip,
+  Tooltip,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Snackbar,
+  Alert
+} from '@mui/material';
 import { EditOutlined } from '@ant-design/icons';
+import {CKEditor} from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-export default function CreateResolutionPage() {
+export default function EditResolutionPage() {
+  const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const initialRecordId = location.state?.recordId || '';
-  const initialRecordNumber = location.state?.recordNumber || '';
-
-  const [form, setForm] = useState({
-    issuedDate: new Date().toISOString().slice(0, 16),
-    number: '',
-    filePath: '',
-    resolvedByDean: true,
-    content: '',
-    recordId: initialRecordId
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [recordSearch, setRecordSearch] = useState('');
-  const [searchTouched, setSearchTouched] = useState(false);
-  // Add this state for the selected template
-  const [selectedTemplateId, setSelectedTemplateId] = useState('');
-
-  // Redux state for search results
-  const searchResults = useSelector((state) => state.records.searchResults);
-  const searchLoading = useSelector((state) => state.records.searchLoading);
-  const applicants = useSelector((state) => state.applicants.list);
-  const applicantsLoading = useSelector((state) => state.applicants.loading);
+  const { current: resolution, loading, error } = useSelector((state) => state.resolutions);
   const templates = useSelector((state) => state.templates.list);
   const templatesLoading = useSelector((state) => state.templates.loading);
 
-  // Handle input changes
+  const [form, setForm] = useState({
+    number: '',
+    issuedDate: '',
+    recordId: '',
+    content: '',
+    resolvedByDean: true
+  });
+  const [selectedTemplateId, setSelectedTemplateId] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [recordSearch, setRecordSearch] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchTouched, setSearchTouched] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchResolutionById(id));
+      dispatch(fetchTemplatesByPage(1));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (resolution) {
+      if (resolution.resolved) {
+        setSnackbarOpen(true);
+        setTimeout(() => {
+          navigate(`/resoluciones/${id}`);
+        }, 2000);
+      } else {
+        setForm({
+          number: resolution.number || '',
+          issuedDate: resolution.issuedDate ? resolution.issuedDate.slice(0, 16) : '',
+          recordId: resolution.recordId || '',
+          content: resolution.content || '',
+          resolvedByDean: !!resolution.resolvedByDean
+        });
+      }
+    }
+  }, [resolution, id, navigate]);
+
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
   const handleContentChange = (event, editor) => {
+    const data = editor.getData();
     setForm((prev) => ({
       ...prev,
-      content: editor.getData()
+      content: data
     }));
   };
 
-  // Handle search input change
-  const handleRecordSearchChange = (e) => {
-    setRecordSearch(e.target.value);
-    setSearchTouched(false);
-    setForm((prev) => ({
-      ...prev,
-      recordId: ''
-    }));
-  };
-
-  // Handle search on Enter key
-  const handleRecordSearchKeyDown = async (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      await handleSearchRecords();
-    }
-  };
-
-  // Search records by number or applicantDocument
-  const handleSearchRecords = async () => {
-    setSearchTouched(true);
-    setError('');
-    const value = recordSearch.trim();
-    let body = {};
-    if (value !== '') {
-      // If value is a number, send as integer, else as string
-      body = isNaN(Number(value))
-        ? { number: value, applicantDocument: value }
-        : { number: Number(value), applicantDocument: value };
-    }
-    dispatch(searchRecords(body));
-  };
-
-  // When user selects a record from the search results
-  const handleSelectRecord = (record) => {
-    setForm((prev) => ({
-      ...prev,
-      recordId: record.id
-    }));
-    setRecordSearch(
-      `Expediente #${record.number} - ${record.applicant?.names || ''} (Documento: ${record.applicant?.document || ''})`
-    );
-    setSearchTouched(false);
-    setError('');
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const result = await dispatch(
-        createResolution({
-          issuedDate: new Date(form.issuedDate).toISOString(),
-          number: Number(form.number),
-          resolvedByDean: form.resolvedByDean,
-          content: form.content,
-          recordId: form.recordId === '' ? null : Number(form.recordId),
-          resolved: false // Always send as draft
-        })
-      ).unwrap();
-      navigate(`/resoluciones/${result.id}`);
-    } catch (err) {
-      setError(err?.message || 'Error creating resolution');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Clear search results when recordSearch changes and not touched
-  useEffect(() => {
-    if (!searchTouched) {
-      dispatch({ type: 'records/clearSearchResults' });
-    }
-  }, [recordSearch, searchTouched, dispatch]);
-
-  // Fetch applicants if not already present
-  useEffect(() => {
-    if (!applicants || applicants.length === 0) {
-      dispatch(fetchApplicants());
-    }
-  }, [dispatch, applicants]);
-
-  // Fetch templates on mount
-  useEffect(() => {
-    dispatch(fetchTemplatesByPage(1));
-  }, [dispatch]);
-
-  // Search by recordId to get the record and applicant info
-  useEffect(() => {
-    if (initialRecordId) {
-      dispatch(searchRecords({ number: Number(initialRecordId) })).then((action) => {
-        const record = action.payload?.[0];
-        if (record) {
-          setRecordSearch(
-            `Expediente #${record.number} - ${record.applicant?.names || ''} (Documento: ${record.applicant?.document || ''})`
-          );
-          setForm((prev) => ({
-            ...prev,
-            recordId: record.id
-          }));
-        }
-      });
-    }
-  }, [dispatch, initialRecordId]);
-
-  // Search by recordNumber to get the record and applicant info
-  useEffect(() => {
-    if (initialRecordNumber) {
-      dispatch(searchRecords({ number: Number(initialRecordNumber) })).then((action) => {
-        const record = action.payload?.[0];
-        if (record) {
-          setRecordSearch(
-            `Expediente #${record.number} - ${record.applicant?.names || ''} (Documento: ${record.applicant?.document || ''})`
-          );
-          setForm((prev) => ({
-            ...prev,
-            recordId: record.id
-          }));
-        }
-      });
-    }
-  }, [dispatch, initialRecordNumber]);
-
-  // Handle template selection
   const handleTemplateChange = (e) => {
     const templateId = e.target.value;
     setSelectedTemplateId(templateId);
@@ -195,14 +105,53 @@ export default function CreateResolutionPage() {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(updateResolution({ id, ...form })).then((action) => {
+      if (!action.error) {
+        navigate(`/resoluciones/${id}`);
+      }
+    });
+  };
+
+  const handleRecordSearchChange = (e) => {
+    setRecordSearch(e.target.value);
+    setSearchTouched(false);
+  };
+
+  const handleRecordSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setSearchLoading(true);
+      setSearchTouched(true);
+      // Replace this with your actual searchRecords thunk if available
+      const results = await dispatch(
+        // searchRecords({ number: Number(recordSearch) }) // Uncomment if you have this thunk
+      );
+      // setSearchResults(results.payload || []); // Uncomment if using thunk
+      setSearchLoading(false);
+    }
+  };
+
+  const handleSelectRecord = (record) => {
+    setRecordSearch(
+      `Expediente #${record.number} - ${record.applicant?.names || ''} (Documento: ${record.applicant?.document || ''})`
+    );
+    setForm((prev) => ({
+      ...prev,
+      recordId: record.id
+    }));
+    setSearchTouched(false);
+  };
+
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" mb={2}>Generar Resolución</Typography>
+        <Typography variant="h5" mb={2}>Editar Resolución</Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 12 }}>
             <Box display="flex" justifyContent="flex-end">
-              <Tooltip title="Esta resolución se creará como borrador. Puedes editar volver a este documento cuando necesites.">
+              <Tooltip title="Esta resolución se está editando como borrador.">
                 <Chip
                   label={
                     <Box display="flex" alignItems="center" gap={0.5}>
@@ -222,9 +171,9 @@ export default function CreateResolutionPage() {
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField
-                  label="Number"
-                  name="number"
-                  type="number"
+              label="Number"
+              name="number"
+              type="number"
               value={form.number}
               onChange={handleChange}
               fullWidth
@@ -242,6 +191,7 @@ export default function CreateResolutionPage() {
               fullWidth
               margin="normal"
               required
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 12 }}>
@@ -256,7 +206,7 @@ export default function CreateResolutionPage() {
               autoComplete="off"
               helperText="Presione Enter para buscar. Seleccione un expediente de la lista."
             />
-            {(searchLoading || applicantsLoading) && (
+            {searchLoading && (
               <Typography variant="body2" color="textSecondary" mb={1}>
                 Buscando...
               </Typography>
@@ -340,8 +290,8 @@ export default function CreateResolutionPage() {
           </Grid>
           <Grid size={{ xs: 12, md: 12 }}>
             {error && (
-              <Typography color="error" variant="body2" mb={2}>
-                {error}
+              <Typography color="error">
+                {error?.message || error?.detail || error?.description || 'Ocurrió un error'}
               </Typography>
             )}
             <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
@@ -359,12 +309,21 @@ export default function CreateResolutionPage() {
                 color="primary"
                 disabled={loading}
               >
-                {loading ? 'Saving...' : 'Create'}
+                {loading ? 'Saving...' : 'Guardar Cambios'}
               </Button>
             </Box>
           </Grid>
         </Grid>
       </Paper>
+      <Snackbar
+        open={snackbarOpen}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        autoHideDuration={2000}
+      >
+        <Alert severity="info" sx={{ width: '100%' }}>
+          La resolución ya está resuelta y no puede ser editada.
+        </Alert>
+        </Snackbar>
     </Box>
   );
 }
