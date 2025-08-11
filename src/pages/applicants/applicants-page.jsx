@@ -32,7 +32,18 @@ export default function ApplicantsPage() {
   }, [searchTerm]);
 
   return (
-    <MainCard title="Applicants">
+    <MainCard 
+      title="Solicitantes"
+      secondary={
+        <Button
+          variant="contained"
+          startIcon={<PlusOutlined />}
+          onClick={() => setCreateModalOpen(true)}
+        >
+          Nuevo Solicitante
+        </Button>
+      }
+    >
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Stack direction="row" spacing={1}>
           <TextField
@@ -50,13 +61,6 @@ export default function ApplicantsPage() {
             }}
           />
         </Stack>
-        <Button
-          variant="contained"
-          startIcon={<PlusOutlined />}
-          onClick={() => setCreateModalOpen(true)}
-        >
-          New Applicant
-        </Button>
       </Box>
       <ApplicantsTable ref={tableRef} />
       <CreateApplicantModal

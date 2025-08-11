@@ -76,10 +76,6 @@ const RolesTable = forwardRef((props, ref) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
-          Roles
-        </Typography>
-
         {loading ? (
           <Box display="flex" justifyContent="center" mt={4}>
             <CircularProgress />

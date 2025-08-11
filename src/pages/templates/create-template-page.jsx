@@ -44,51 +44,49 @@ export default function CreateTemplatePage() {
   };
 
   return (
-    <Box maxWidth={1200} mx="auto" mt={4} sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h5" mb={2}>
           Crear Nueva Plantilla de Resolución
         </Typography>
-        <form onSubmit={handleSubmit}>
-          <Stack spacing={3}>
-            <TextField
-              label="Nombre"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              fullWidth
+        <Stack spacing={3}>
+          <TextField
+            label="Nombre"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            fullWidth
+          />
+          <div>
+            <Typography variant="subtitle1" gutterBottom>
+              Contenido
+            </Typography>
+            <CKEditor
+              editor={ClassicEditor}
+              data={form.content}
+              onChange={handleCKChange}
             />
-            <div>
-              <Typography variant="subtitle1" gutterBottom>
-                Contenido
-              </Typography>
-              <CKEditor
-                editor={ClassicEditor}
-                data={form.content}
-                onChange={handleCKChange}
-              />
-            </div>
-            <Box display="flex" justifyContent="flex-end" gap={2}>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => navigate('/templates')}
-                disabled={loading}
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={loading}
-              >
-                {loading ? 'Guardando...' : 'Crear Plantilla'}
-              </Button>
-            </Box>
-          </Stack>
-        </form>
+          </div>
+          <Box display="flex" justifyContent="flex-end" gap={2}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate('/templates')}
+              disabled={loading}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+            >
+              {loading ? 'Guardando...' : 'Crear Plantilla'}
+            </Button>
+          </Box>
+        </Stack>
       </Paper>
     </Box>
   );

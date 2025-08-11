@@ -20,9 +20,8 @@ export default function ShowResolutionPage() {
   }, [dispatch, id]);
 
   return (
-    <MainCard title="Resolution Details">
-      <Paper sx={{ p: 3, maxWidth: 700, mx: 'auto', position: 'relative' }}>
-        
+    <Box maxWidth={1200} mx="auto" mt={4}>
+      <Paper sx={{ p: 4 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Button
             variant="outlined"
@@ -113,6 +112,6 @@ export default function ShowResolutionPage() {
           <Typography>No resolution found.</Typography>
         )}
       </Paper>
-    </MainCard>
+    </Box>
     );
 }

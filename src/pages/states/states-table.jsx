@@ -48,7 +48,7 @@ const StatesTable = forwardRef((props, ref) => {
               paginationMode="server"
               rowCount={total}
               loading={loading}
-              pageSizeOptions={[5]}
+              pageSizeOptions={[50]}
               paginationModel={{ page, pageSize: 5 }}
               onPaginationModelChange={({ page: newPage }) => {
                 dispatch(fetchStates(newPage));

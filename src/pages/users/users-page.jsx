@@ -28,7 +28,18 @@ export default function UsersPage() {
   };
 
   return (
-    <MainCard title="Usuarios del sistema">
+    <MainCard 
+      title="Usuarios del sistema"
+      secondary={
+        <Button
+          variant="contained"
+          startIcon={<PlusOutlined />}
+          onClick={() => setCreateModalOpen(true)}
+        >
+          Nuevo Usuario
+        </Button>
+      }
+    >
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Stack direction="row" spacing={1}>
           <TextField
@@ -64,13 +75,6 @@ export default function UsersPage() {
             }}
           />
         </Stack>
-        <Button
-          variant="contained"
-          startIcon={<PlusOutlined />}
-          onClick={() => setCreateModalOpen(true)}
-        >
-          Nuevo Usuario
-        </Button>
       </Box>
       <UsersTable ref={tableRef} />
       <CreateUserModal

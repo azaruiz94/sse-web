@@ -196,10 +196,6 @@ const UsersTable = forwardRef((props, ref) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
-          Users
-        </Typography>
-
         {/* Show warning if missing role or dependency permissions */}
         {(!hasVerRol || !hasVerDependencia) && (
           <Box mb={2}>
@@ -208,7 +204,6 @@ const UsersTable = forwardRef((props, ref) => {
             </Alert>
           </Box>
         )}
-
         <div style={{ height: 420, width: '100%' }}>
           <DataGrid
             rows={users}

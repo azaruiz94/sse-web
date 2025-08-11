@@ -14,8 +14,9 @@ export default function TemplatesPage() {
   const navigate = useNavigate();
 
   return (
-    <MainCard title="Plantillas de Resolución">
-      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={2}>
+    <MainCard 
+      title="Plantillas de Resolución"
+      secondary={
         <Button
           variant="contained"
           startIcon={<PlusOutlined />}
@@ -23,7 +24,8 @@ export default function TemplatesPage() {
         >
           Nueva Plantilla
         </Button>
-      </Box>
+      }
+    >
       <TemplatesTable ref={tableRef} />
     </MainCard>
   );

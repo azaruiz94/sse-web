@@ -21,7 +21,6 @@ const DependenciesTable = forwardRef((props, ref) => {
   const loading = useSelector((state) => state.dependencies.loading);
   const columns = [
     { field: 'name', headerName: 'Name', width: 200 }
-    // Add more columns as needed
   ];
 
   useEffect(() => {

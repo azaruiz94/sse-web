@@ -25,7 +25,6 @@ import { useSnackbar } from 'notistack';
 import {
   Card,
   CardContent,
-  Typography,
   CircularProgress,
   Box
 } from '@mui/material';
@@ -115,10 +114,6 @@ const ApplicantsTable = forwardRef((props, ref) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
-          Applicants
-        </Typography>
-
         {loading ? (
           <Box display="flex" justifyContent="center" mt={4}>
             <CircularProgress />

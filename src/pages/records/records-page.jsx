@@ -12,8 +12,9 @@ export default function RecordsPage() {
   const navigate = useNavigate();
 
   return (
-    <MainCard title="Expedientes">
-      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={2}>
+    <MainCard 
+      title="Expedientes"
+      secondary={
         <Button
           variant="contained"
           startIcon={<PlusOutlined />}
@@ -21,7 +22,8 @@ export default function RecordsPage() {
         >
           Nuevo Expediente
         </Button>
-      </Box>
+      }
+    >
       <RecordsTable ref={tableRef} />
     </MainCard>
   );

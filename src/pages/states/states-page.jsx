@@ -12,18 +12,18 @@ export default function StatesPage() {
   const tableRef = useRef();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   return (
-    <MainCard title="Estados de expedientes y resoluciones">
-      <Box display="flex" justifyContent="right" alignItems="center" mb={2}>
+    <MainCard title="Estados de expedientes"
+      secondary={
         <Button
           variant="contained"
           startIcon={<PlusOutlined />}
           onClick={() => setCreateModalOpen(true)}
         >
-          New State
+          Nuevo Estado
         </Button>
-      </Box>
+      }
+    >
       <StatesTable ref={tableRef} />
-
       <CreateStateModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

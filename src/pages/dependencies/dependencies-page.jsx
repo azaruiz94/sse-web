@@ -12,8 +12,9 @@ export default function DependenciesPage() {
   const tableRef = useRef();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   return (
-    <MainCard title="Dependencias de la FIUNI">
-      <Box display="flex" justifyContent="right" alignItems="center" mb={2}>
+    <MainCard 
+      title="Dependencias de la FIUNI"
+      secondary={
         <Button
           variant="contained"
           startIcon={<PlusOutlined />}
@@ -21,9 +22,9 @@ export default function DependenciesPage() {
         >
           Nueva Dependencia
         </Button>
-      </Box>
+      }
+    >
       <DependenciesTable ref={tableRef} />
-
       <CreateDependencyModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

@@ -12,8 +12,9 @@ export default function RolesPage() {
   const tableRef = useRef();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   return (
-    <MainCard title="Roles de usuarios del sistema">
-      <Box display="flex" justifyContent="right" alignItems="center" mb={2}>
+    <MainCard 
+      title="Roles de usuarios del sistema"
+      secondary={
         <Button
           variant="contained"
           startIcon={<PlusOutlined />}
@@ -21,9 +22,9 @@ export default function RolesPage() {
         >
           Nuevo Rol
         </Button>
-      </Box>
+      }
+    >
       <RolesTable ref={tableRef} />
-
       <CreateRoleModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
