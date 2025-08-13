@@ -45,7 +45,7 @@ export default function ForwardRecordModal({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Reenviar expediente</DialogTitle>
+      <DialogTitle>Remitir expediente</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <FormControl fullWidth margin="normal">
@@ -96,7 +96,7 @@ export default function ForwardRecordModal({
             Cancelar
           </Button>
           <Button type="submit" variant="contained" color="primary" disabled={loading}>
-            {loading ? "Enviando..." : "Reenviar"}
+            {loading ? "Enviando..." : "Remitir"}
           </Button>
         </DialogActions>
       </form>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchRecordById, forwardRecord } from "store/slices/recordsSlice";
+import { fetchRecordById, forwardRecord, fetchRecordFileUrl } from "store/slices/recordsSlice";
 import { fetchDependencies } from "store/slices/dependenciesSlice";
 import { fetchStates } from "store/slices/statesSlice";
 import { fetchUsers } from "store/slices/usersSlice";
@@ -35,6 +35,7 @@ const ShowRecordPage = () => {
   const { enqueueSnackbar } = useSnackbar();
   const record = useSelector((state) => state.records.selectedRecord);
   const loading = useSelector((state) => state.records.loading);
+  const fileUrl = useSelector(state => state.records.fileUrl);
 
   // Get dependencies, states, and users from redux
   const dependencies = useSelector((state) => state.dependencies.list);
@@ -44,6 +45,7 @@ const ShowRecordPage = () => {
   // Modal state
   const [forwardModalOpen, setForwardModalOpen] = useState(false);
   const [forwardLoading, setForwardLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
   // Helper functions
   const getDependencyName = (depId) => {
@@ -70,6 +72,19 @@ const ShowRecordPage = () => {
     if (states.length === 0) dispatch(fetchStates());
     if (users.length === 0) dispatch(fetchUsers());
   }, []); // Only run once on mount
+
+  // Clear fileUrl after 5 minutes or when unmounting
+  useEffect(() => {
+    let timer;
+    if (fileUrl) {
+      timer = setTimeout(() => {
+        dispatch({ type: 'records/clearFileUrl' });
+      }, 5 * 60 * 1000); // 5 minutes
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [fileUrl, dispatch]);
 
   if (
     loading ||
@@ -106,27 +121,33 @@ const ShowRecordPage = () => {
     navigate('/resoluciones/create', { state: { recordNumber: record.number } });
   };
 
+  const handleViewOrDownload = async () => {
+    setFileLoading(true);
+    await dispatch(fetchRecordFileUrl(record.id));
+    setFileLoading(false);
+  };
+
   return (
     <Box maxWidth={1200} mx="auto" mt={4}>
       <Paper sx={{ p: 4 }}>
         <Box display="flex" justifyContent="flex-end" mb={2} gap={2}>
           <Button
             variant="contained"
-            color="primary"
+            color="secondary"
             onClick={handleResolveClick}
           >
             Generar resolución
           </Button>
           <Button
             variant="contained"
-            color="secondary"
+            color="primary"
             onClick={() => setForwardModalOpen(true)}
           >
-            Reenviar expediente
+            Remitir expediente
           </Button>
         </Box>
         <Typography variant="h5" gutterBottom>
-          Record Details
+          Detalles de expediente
         </Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 8 }}>
@@ -151,10 +172,19 @@ const ShowRecordPage = () => {
               margin="dense"
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs: 12, md: 12 }}>
             <TextField
               label="Motivo de solicitud/nota"
               value={record.motive}
+              fullWidth
+              InputProps={{ readOnly: true }}
+              margin="dense"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              label="Dependencia actual"
+              value={getDependencyName(record.dependencyId)}
               fullWidth
               InputProps={{ readOnly: true }}
               margin="dense"
@@ -178,38 +208,23 @@ const ShowRecordPage = () => {
               margin="dense"
             />
           </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              label="File Path"
-              value={record.filePath}
-              fullWidth
-              InputProps={{ readOnly: true }}
-              margin="dense"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <TextField
-              label="Dependencia actual"
-              value={getDependencyName(record.dependencyId)}
-              fullWidth
-              InputProps={{ readOnly: true }}
-              margin="dense"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, md: 12 }}>
             <FormControl component="fieldset" margin="dense">
               <FormLabel component="legend">Tipo de solicitud</FormLabel>
-              <RadioGroup row value={record.internal ? "internal" : "external"}>
+              <RadioGroup
+                row={false} // Stack vertically
+                value={record.internal ? "internal" : "external"}
+              >
                 <FormControlLabel
                   value="internal"
                   control={<Radio />}
-                  label="Interno"
+                  label="Interna"
                   disabled
                 />
                 <FormControlLabel
                   value="external"
                   control={<Radio />}
-                  label="Externo"
+                  label="Externa"
                   disabled
                 />
               </RadioGroup>
@@ -251,6 +266,30 @@ const ShowRecordPage = () => {
                 </TableBody>
               </Table>
             </TableContainer>
+          </Box>
+        )}
+        {record.filePath && (
+          <Box mt={2} mb={2}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleViewOrDownload}
+              disabled={fileLoading}
+            >
+              {fileLoading ? 'Generando enlace...' : 'Ver documento adjunto'}
+            </Button>
+            {fileUrl && (
+              <a
+                href={fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ marginLeft: 16, textDecoration: 'none' }}
+              >
+                <Button variant="contained" color="success">
+                  Abrir PDF
+                </Button>
+              </a>
+            )}
           </Box>
         )}
       </Paper>

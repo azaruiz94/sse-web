@@ -80,6 +80,37 @@ export const searchRecords = createAsyncThunk(
   }
 );
 
+// Async thunk for fetching a record's file URL
+export const fetchRecordFileUrl = createAsyncThunk(
+  'records/fetchRecordFileUrl',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/records/${id}/file-url`);
+      return response.data.url;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// Async thunk for uploading a record PDF
+export const uploadRecordPdf = createAsyncThunk(
+  'records/uploadRecordPdf',
+  async ({ id, file }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await api.post(`/records/${id}/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const recordsSlice = createSlice({
   name: 'records',
   initialState: {
@@ -91,8 +122,13 @@ const recordsSlice = createSlice({
     nextRecordNumber: null,
     searchResults: [],
     searchLoading: false,
+    fileUrl: null,
   },
-  reducers: {},
+  reducers: {
+    clearFileUrl: (state) => {
+      state.fileUrl = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createRecord.pending, (state) => {
@@ -156,7 +192,7 @@ const recordsSlice = createSlice({
         // Optionally update selectedRecord if the backend returns the updated record
         state.selectedRecord = action.payload;
         // Optionally update the record in the records list
-        const idx = state.records.findIndex(r => r.id === action.payload.id);
+        const idx = state.records.findIndex((r) => r.id === action.payload.id);
         if (idx !== -1) {
           state.records[idx] = action.payload;
         }
@@ -178,8 +214,35 @@ const recordsSlice = createSlice({
         state.searchLoading = false;
         state.error = action.payload;
         state.searchResults = [];
+      })
+      .addCase(fetchRecordFileUrl.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.fileUrl = null;
+      })
+      .addCase(fetchRecordFileUrl.fulfilled, (state, action) => {
+        state.loading = false;
+        state.fileUrl = action.payload.url || action.payload;
+      })
+      .addCase(fetchRecordFileUrl.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.fileUrl = null;
+      })
+      .addCase(uploadRecordPdf.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(uploadRecordPdf.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally update filePath or other state here
+      })
+      .addCase(uploadRecordPdf.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
+export const { clearFileUrl } = recordsSlice.actions;
 export default recordsSlice.reducer;
