@@ -10,13 +10,12 @@ import { DataGrid } from '@mui/x-data-grid';
 import {
   Card,
   CardContent,
-  Typography,
   CircularProgress,
   Box,
   IconButton,
   Chip
 } from '@mui/material';
-import { EyeOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const ResolutionsTable = forwardRef((props, ref) => {
@@ -91,15 +90,19 @@ const ResolutionsTable = forwardRef((props, ref) => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 100,
+      width: 160,
       sortable: false,
       renderCell: (params) => (
-        <IconButton
-          color="primary"
-          onClick={() => navigate(`/resoluciones/${params.row.id}`)}
-        >
-          <EyeOutlined />
-        </IconButton>
+        <>
+          <IconButton color="primary" onClick={() => navigate(`/resoluciones/${params.row.id}`)}>
+            <EyeOutlined />
+          </IconButton>
+          {!params.row.resolved && (
+            <IconButton color="secondary" onClick={() => navigate(`/resoluciones/${params.row.id}/edit`)}>
+            <EditOutlined />
+          </IconButton>
+          )}
+        </>
       )
     }
   ];

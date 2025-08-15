@@ -52,6 +52,35 @@ export const updateResolution = createAsyncThunk(
   }
 );
 
+export const uploadResolutionPdf = createAsyncThunk(
+  'resolutions/uploadResolutionPdf',
+  async ({ id, file }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await api.post(`${API_BASE}/${id}/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+export const fetchResolutionFileUrl = createAsyncThunk(
+  'resolutions/fetchResolutionFileUrl',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_BASE}/${id}/file-url`);
+      return response.data.url || response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
 // Slice
 const resolutionsSlice = createSlice({
   name: 'resolutions',
@@ -61,6 +90,7 @@ const resolutionsSlice = createSlice({
     loading: false,
     error: null,
     totalElements: 0,
+    fileUrl: null, // Add this for file URL state
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -125,6 +155,34 @@ const resolutionsSlice = createSlice({
       .addCase(updateResolution.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Upload PDF
+      .addCase(uploadResolutionPdf.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(uploadResolutionPdf.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally update filePath or other state here
+      })
+      .addCase(uploadResolutionPdf.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch file URL
+      .addCase(fetchResolutionFileUrl.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.fileUrl = null;
+      })
+      .addCase(fetchResolutionFileUrl.fulfilled, (state, action) => {
+        state.loading = false;
+        state.fileUrl = action.payload;
+      })
+      .addCase(fetchResolutionFileUrl.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.fileUrl = null;
       });
   },
 });

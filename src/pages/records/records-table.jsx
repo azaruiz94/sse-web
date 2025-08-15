@@ -6,7 +6,7 @@ import {
   useEffect
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRecordsByPage } from 'store/slices/recordsSlice';
+import { fetchRecordsByPage, searchRecords } from 'store/slices/recordsSlice';
 import { fetchApplicants } from 'store/slices/applicantsSlice';
 import { fetchStates } from 'store/slices/statesSlice';
 import { fetchDependencies } from 'store/slices/dependenciesSlice';
@@ -14,14 +14,12 @@ import { DataGrid } from '@mui/x-data-grid';
 import {
   Card,
   CardContent,
-  Typography,
   CircularProgress,
   Box,
   IconButton,
 } from '@mui/material';
 import {
   EyeOutlined,
-  EditOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,8 +27,14 @@ const RecordsTable = forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const records = useSelector((state) => state.records.records);
-  const total = useSelector((state) => state.records.totalElements || 0);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const records = useSelector((state) =>
+    searchTerm.trim() ? state.records.searchResults : state.records.records
+  );
+  const total = useSelector((state) =>
+    searchTerm.trim() ? state.records.searchResults?.length || 0 : state.records.totalElements || 0
+  );
   const loading = useSelector((state) => state.records.loading);
   const [page, setPage] = useState(0);
   const [pageSize] = useState(5);
@@ -40,13 +44,30 @@ const RecordsTable = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     refresh: () => {
-      dispatch(fetchRecordsByPage(page + 1));
+      setSearchTerm('');
+      setPage(0);
+      dispatch(fetchRecordsByPage(1));
+    },
+    searchRecords: (term) => {
+      setSearchTerm(term);
+      setPage(0);
+      let payload = {};
+      if (term.trim()) {
+        payload.number = Number(term);
+        payload.applicantDocument = term;
+        dispatch(searchRecords(payload));
+      } else {
+        dispatch(fetchRecordsByPage(1));
+      }
     }
   }));
 
   useEffect(() => {
-    dispatch(fetchRecordsByPage(page + 1));
-  }, [dispatch, page]);
+    if (!searchTerm.trim()) {
+      dispatch(fetchRecordsByPage(page + 1));
+    }
+    // If searchTerm is set, searchRecords will handle fetching
+  }, [dispatch, page, searchTerm]);
 
   useEffect(() => {
     dispatch(fetchApplicants());
@@ -58,10 +79,6 @@ const RecordsTable = forwardRef((props, ref) => {
     navigate(`/expedientes/${id}`);
   }, [navigate]);
 
-  const handleEdit = useCallback((row) => {
-    navigate(`/expedientes/${row.id}/edit`);
-  }, [navigate]);
-
   const columns = [
     { field: 'number', headerName: 'Number', width: 120 },
     {
@@ -69,7 +86,6 @@ const RecordsTable = forwardRef((props, ref) => {
       headerName: 'Applicant',
       width: 200,
       valueGetter: (params) => {
-        // params.row.applicant is expected to be present in the record
         const applicant = params;
         if (applicant) {
           return `${applicant.names || ''} (${applicant.document || ''})`;
@@ -104,9 +120,6 @@ const RecordsTable = forwardRef((props, ref) => {
         <>
           <IconButton color="primary" onClick={() => handleShow(params.row.id)}>
             <EyeOutlined />
-          </IconButton>
-          <IconButton color="secondary" onClick={() => handleEdit(params.row)}>
-            <EditOutlined />
           </IconButton>
         </>
       )

@@ -279,16 +279,21 @@ const ShowRecordPage = () => {
               {fileLoading ? 'Generando enlace...' : 'Ver documento adjunto'}
             </Button>
             {fileUrl && (
-              <a
-                href={fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ marginLeft: 16, textDecoration: 'none' }}
-              >
-                <Button variant="contained" color="success">
-                  Abrir PDF
-                </Button>
-              </a>
+              <>
+                <a
+                  href={fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ marginLeft: 16, textDecoration: 'none' }}
+                >
+                  <Button variant="contained" color="success">
+                    Abrir PDF
+                  </Button>
+                </a>
+                <Typography variant="caption" color="textSecondary" display="block" mt={1}>
+                  Por seguridad, el enlace será válido sólo por 5 minutos.
+                </Typography>
+              </>
             )}
           </Box>
         )}

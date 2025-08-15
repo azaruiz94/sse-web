@@ -70,9 +70,9 @@ export const forwardRecord = createAsyncThunk(
 // Async thunk for searching records
 export const searchRecords = createAsyncThunk(
   'records/searchRecords',
-  async (params, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const response = await api.post('/records/search', params);
+      const response = await api.post('/records/search', payload);
       return response.data.records || [];
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -209,6 +209,7 @@ const recordsSlice = createSlice({
       .addCase(searchRecords.fulfilled, (state, action) => {
         state.searchLoading = false;
         state.searchResults = action.payload;
+        state.totalElements = action.payload.length;
       })
       .addCase(searchRecords.rejected, (state, action) => {
         state.searchLoading = false;
