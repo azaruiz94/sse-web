@@ -93,6 +93,20 @@ export const fetchNextResolutionNumber = createAsyncThunk(
   }
 );
 
+// Async thunk for searching resolutions
+export const searchResolutions = createAsyncThunk(
+  'resolutions/searchResolutions',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`${API_BASE}/search`, payload);
+      // Assuming response.data.resolutions is the array of found resolutions
+      return response.data.resolutions || [];
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 // Slice
 const resolutionsSlice = createSlice({
   name: 'resolutions',
@@ -103,7 +117,8 @@ const resolutionsSlice = createSlice({
     error: null,
     totalElements: 0,
     fileUrl: null,
-    nextResolutionNumber: null
+    nextResolutionNumber: null,
+    searchResults: []
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -209,6 +224,21 @@ const resolutionsSlice = createSlice({
       .addCase(fetchNextResolutionNumber.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Search resolutions
+      .addCase(searchResolutions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.searchResults = [];
+      })
+      .addCase(searchResolutions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.searchResults = action.payload;
+      })
+      .addCase(searchResolutions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.searchResults = [];
       });
   },
 });

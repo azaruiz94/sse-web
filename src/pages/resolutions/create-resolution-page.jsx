@@ -242,10 +242,14 @@ export default function CreateResolutionPage() {
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField
-                  label="Número"
-                  value={form.number}
-                  margin="normal"
-                  fullWidth
+              label="Número"
+              name="number"
+              type="number"
+              value={form.number}
+              onChange={handleChange}
+              margin="normal"
+              fullWidth
+              required
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>

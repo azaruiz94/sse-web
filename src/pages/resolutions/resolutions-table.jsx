@@ -5,7 +5,7 @@ import {
   useEffect
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchResolutionsByPage } from 'store/slices/resolutionsSlice';
+import { fetchResolutionsByPage, searchResolutions } from 'store/slices/resolutionsSlice';
 import { DataGrid } from '@mui/x-data-grid';
 import {
   Card,
@@ -22,21 +22,45 @@ const ResolutionsTable = forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const resolutions = useSelector((state) => state.resolutions.list);
-  const total = useSelector((state) => state.resolutions.totalElements || 0);
-  const loading = useSelector((state) => state.resolutions.loading);
   const [page, setPage] = useState(0);
   const [pageSize] = useState(5);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Use searchResults if searching, otherwise use list
+  const resolutions = useSelector((state) =>
+    searchTerm.trim() ? state.resolutions.searchResults : state.resolutions.list
+  );
+  const total = useSelector((state) =>
+    searchTerm.trim() ? state.resolutions.searchResults?.length || 0 : state.resolutions.totalElements || 0
+  );
+  const loading = useSelector((state) => state.resolutions.loading);
 
   useImperativeHandle(ref, () => ({
     refresh: () => {
-      dispatch(fetchResolutionsByPage(page + 1));
+      setSearchTerm('');
+      setPage(0);
+      dispatch(fetchResolutionsByPage(1));
+    },
+    searchResolutions: (term) => {
+      setSearchTerm(term);
+      setPage(0);
+      let payload = {};
+      if (term.trim()) {
+        payload.number = Number(term);
+        payload.applicantDocument = term;
+        dispatch(searchResolutions(payload));
+      } else {
+        dispatch(fetchResolutionsByPage(1));
+      }
     }
   }));
 
   useEffect(() => {
-    dispatch(fetchResolutionsByPage(page + 1));
-  }, [dispatch, page]);
+    if (!searchTerm.trim()) {
+      dispatch(fetchResolutionsByPage(page + 1));
+    }
+    // If searchTerm is set, searchResolutions will handle fetching
+  }, [dispatch, page, searchTerm]);
 
   const columns = [
     { field: 'number', headerName: 'Number', width: 120 },
