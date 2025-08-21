@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Button, TextField, FormControlLabel, Checkbox, Typography, Paper, List, ListItem, ListItemButton, ListItemText, FormControl, FormLabel, RadioGroup, Radio } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { createResolution } from 'store/slices/resolutionsSlice';
+import { createResolution, fetchNextResolutionNumber } from 'store/slices/resolutionsSlice';
 import { searchRecords } from 'store/slices/recordsSlice';
 import { fetchApplicants } from 'store/slices/applicantsSlice';
 import { fetchTemplatesByPage } from 'store/slices/templatesSlice';
@@ -41,6 +41,7 @@ export default function CreateResolutionPage() {
   const applicantsLoading = useSelector((state) => state.applicants.loading);
   const templates = useSelector((state) => state.templates.list);
   const templatesLoading = useSelector((state) => state.templates.loading);
+  const nextResolutionNumber = useSelector(state => state.resolutions.nextResolutionNumber);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -116,7 +117,7 @@ export default function CreateResolutionPage() {
           resolvedByDean: form.resolvedByDean,
           content: form.content,
           recordId: form.recordId === '' ? null : Number(form.recordId),
-          resolved: false // Always send as draft
+          resolved: false // Always send as draft. We have a separate endpoint for resolving drafts.
         })
       ).unwrap();
       navigate(`/resoluciones/${result.id}`);
@@ -145,6 +146,25 @@ export default function CreateResolutionPage() {
   useEffect(() => {
     dispatch(fetchTemplatesByPage(1));
   }, [dispatch]);
+
+  // Fetch next resolution number on mount
+  useEffect(() => {
+    dispatch(fetchNextResolutionNumber());
+  }, [dispatch]);
+
+  // Set the number field when nextResolutionNumber is available
+  useEffect(() => {
+    if (
+      nextResolutionNumber &&
+      typeof nextResolutionNumber === 'object' &&
+      nextResolutionNumber.number !== undefined
+    ) {
+      setForm(prev => ({
+        ...prev,
+        number: String(nextResolutionNumber.number)
+      }));
+    }
+  }, [nextResolutionNumber]);
 
   // Search by recordId to get the record and applicant info
   useEffect(() => {
@@ -222,14 +242,10 @@ export default function CreateResolutionPage() {
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField
-                  label="Number"
-                  name="number"
-                  type="number"
-              value={form.number}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
+                  label="Número"
+                  value={form.number}
+                  margin="normal"
+                  fullWidth
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>

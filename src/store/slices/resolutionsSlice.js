@@ -81,6 +81,18 @@ export const fetchResolutionFileUrl = createAsyncThunk(
   }
 );
 
+export const fetchNextResolutionNumber = createAsyncThunk(
+  'resolutions/fetchNextResolutionNumber',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_BASE}/next-number`);
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
 // Slice
 const resolutionsSlice = createSlice({
   name: 'resolutions',
@@ -90,7 +102,8 @@ const resolutionsSlice = createSlice({
     loading: false,
     error: null,
     totalElements: 0,
-    fileUrl: null, // Add this for file URL state
+    fileUrl: null,
+    nextResolutionNumber: null
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -183,6 +196,19 @@ const resolutionsSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.fileUrl = null;
+      })
+      // Fetch next resolution number
+      .addCase(fetchNextResolutionNumber.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchNextResolutionNumber.fulfilled, (state, action) => {
+        state.loading = false;
+        state.nextResolutionNumber = action.payload;
+      })
+      .addCase(fetchNextResolutionNumber.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

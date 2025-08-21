@@ -30,7 +30,7 @@ const RecordsPage = Loadable(lazy(() => import('pages/records/records-page')));
 const CreateRecordPage = Loadable(lazy(() => import('pages/records/create-record-page')));
 const ShowRecordPage = Loadable(lazy(() => import('pages/records/show-record-page')));
 const ResolutionsPage = Loadable(lazy(() => import('pages/resolutions/resolutions-page')));
-const CreateResolutionPage = Loadable(lazy(() => import('pages/resolutions/create-resolutions-page')));
+const CreateResolutionPage = Loadable(lazy(() => import('pages/resolutions/create-resolution-page')));
 const ShowResolutionPage = Loadable(lazy(() => import('pages/resolutions/show-resolution-page')));
 const EditResolutionPage = Loadable(lazy(() => import('pages/resolutions/edit-resolution-page')));
 // ==============================|| MAIN ROUTING ||============================== //

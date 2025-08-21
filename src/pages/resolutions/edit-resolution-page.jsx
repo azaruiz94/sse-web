@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchResolutionById, updateResolution } from 'store/slices/resolutionsSlice';
+import { fetchResolutionById, updateResolution, fetchNextResolutionNumber } from 'store/slices/resolutionsSlice';
 import { fetchTemplatesByPage } from 'store/slices/templatesSlice';
 import {
   Box,
@@ -36,6 +36,7 @@ export default function EditResolutionPage() {
   const { current: resolution, loading, error } = useSelector((state) => state.resolutions);
   const templates = useSelector((state) => state.templates.list);
   const templatesLoading = useSelector((state) => state.templates.loading);
+  const nextResolutionNumber = useSelector((state) => state.resolutions.nextResolutionNumber);
 
   const [form, setForm] = useState({
     number: '',
@@ -56,9 +57,16 @@ export default function EditResolutionPage() {
       dispatch(fetchResolutionById(id));
       dispatch(fetchTemplatesByPage(1));
     }
+    dispatch(fetchNextResolutionNumber());
   }, [dispatch, id]);
 
   useEffect(() => {
+    // Always use the backend value for number
+    setForm((prev) => ({
+      ...prev,
+      number: nextResolutionNumber || ''
+    }));
+
     if (resolution) {
       if (resolution.resolved) {
         setSnackbarOpen(true);
@@ -66,16 +74,16 @@ export default function EditResolutionPage() {
           navigate(`/resoluciones/${id}`);
         }, 2000);
       } else {
-        setForm({
-          number: resolution.number || '',
+        setForm((prev) => ({
+          ...prev,
           issuedDate: resolution.issuedDate ? resolution.issuedDate.slice(0, 16) : '',
           recordId: resolution.recordId || '',
           content: resolution.content || '',
           resolvedByDean: !!resolution.resolvedByDean
-        });
+        }));
       }
     }
-  }, [resolution, id, navigate]);
+  }, [resolution, id, navigate, nextResolutionNumber]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
