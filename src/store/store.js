@@ -9,6 +9,7 @@ import permissionsReducer from './slices/permissionsSlice';
 import templatesReducer from './slices/templatesSlice';
 import recordsReducer from './slices/recordsSlice';
 import resolutionsReducer from './slices/resolutionsSlice';
+import auditReducer from './slices/auditSlice';
 
 // Combine all reducers
 const appReducer = combineReducers({
@@ -21,7 +22,8 @@ const appReducer = combineReducers({
   permissions: permissionsReducer,
   templates: templatesReducer,
   records: recordsReducer,
-  resolutions: resolutionsReducer
+  resolutions: resolutionsReducer,
+  audit: auditReducer
 });
 
 // Reset state on logout

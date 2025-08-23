@@ -1,13 +1,25 @@
-import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { CircularProgress, Box, Alert } from '@mui/material';
+import { logout } from 'store/slices/authSlice';
 
 const PrivateRoute = ({ children, permission }) => {
   const token = useSelector(state => state.auth.token);
   const user = useSelector(state => state.auth.user);
   const loading = useSelector(state => state.auth.loading);
   const serverDown = useSelector(state => state.auth.serverDown);
-  
+  const sessionExpired = useSelector(state => state.auth.sessionExpired);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (sessionExpired) {
+      dispatch(logout());
+      navigate('/login');
+    }
+  }, [sessionExpired, dispatch, navigate]);
+
   if (serverDown) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">

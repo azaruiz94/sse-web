@@ -93,7 +93,11 @@ const authSlice = createSlice({
         // Check for JWT expired error from backend
         if (
           (typeof action.payload === 'string' && action.payload.includes('expired')) ||
-          (typeof action.payload === 'object' && action.payload?.description?.includes('expired')) ||
+          (typeof action.payload === 'object' && (
+            action.payload?.description?.includes('expired') ||
+            action.payload?.detail?.includes('expired') ||
+            action.payload?.title === 'Forbidden'
+          )) ||
           errorMsg.includes('expired')
         ) {
           state.error = 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.';
@@ -102,6 +106,8 @@ const authSlice = createSlice({
           state.token = null;
           localStorage.removeItem('authUser');
           localStorage.removeItem('authToken');
+          // Optionally: set a flag to trigger redirect in your component
+          state.sessionExpired = true;
         } else if (
           errorMsg.includes('ERR_CONNECTION_REFUSED') ||
           errorMsg.includes('Network Error') ||

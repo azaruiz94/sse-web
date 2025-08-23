@@ -58,6 +58,13 @@ const getAdminMenu = (permissions = []) => {
       type: 'item',
       url: '/roles',
       icon: icons.KeyOutlined
+    },
+    permissions.includes('VER_AUDITORIA') && {
+      id: 'auditoria',
+      title: 'Auditoría',
+      type: 'item',
+      url: '/auditoria',
+      icon: icons.AppstoreAddOutlined
     }
   ].filter(Boolean);
 

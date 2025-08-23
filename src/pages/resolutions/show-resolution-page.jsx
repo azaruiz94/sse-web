@@ -31,7 +31,7 @@ export default function ShowResolutionPage() {
   };
 
   return (
-    <Box maxWidth={1200} mx="auto" mt={4}>
+    <Box maxWidth={1200} mt={4}>
       <Paper sx={{ p: 4 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Button

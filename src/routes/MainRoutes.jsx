@@ -33,6 +33,7 @@ const ResolutionsPage = Loadable(lazy(() => import('pages/resolutions/resolution
 const CreateResolutionPage = Loadable(lazy(() => import('pages/resolutions/create-resolution-page')));
 const ShowResolutionPage = Loadable(lazy(() => import('pages/resolutions/show-resolution-page')));
 const EditResolutionPage = Loadable(lazy(() => import('pages/resolutions/edit-resolution-page')));
+const AuditPage = Loadable(lazy(() => import('pages/audit/audit-page')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -201,6 +202,14 @@ const MainRoutes = {
       element: (
         <PrivateRoute permission="VER_ROL">
           <RolesPage />
+        </PrivateRoute>
+      )
+    },
+    {
+      path: 'auditoria',
+      element: (
+        <PrivateRoute permission="VER_AUDITORIA">
+          <AuditPage />
         </PrivateRoute>
       )
     }

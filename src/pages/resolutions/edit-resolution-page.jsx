@@ -76,7 +76,11 @@ export default function EditResolutionPage() {
       } else {
         setForm((prev) => ({
           ...prev,
-          issuedDate: resolution.issuedDate ? resolution.issuedDate.slice(0, 16) : '',
+          issuedDate: resolution.issuedDate
+            ? typeof resolution.issuedDate === 'string'
+              ? resolution.issuedDate.slice(0, 16)
+              : new Date(resolution.issuedDate).toISOString().slice(0, 16)
+            : '',
           recordId: resolution.recordId || '',
           content: resolution.content || '',
           resolvedByDean: !!resolution.resolvedByDean
