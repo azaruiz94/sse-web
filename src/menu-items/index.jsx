@@ -18,7 +18,8 @@ const adminMenu = getAdminMenu(permissions);
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [dashboard, pages, utilities, support, systemMenu, adminMenu].filter(Boolean)
+  //items: [dashboard, pages, utilities, support, systemMenu, adminMenu].filter(Boolean)
+  items: [dashboard, systemMenu, adminMenu].filter(Boolean)
 };
 
 

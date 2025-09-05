@@ -1,6 +1,7 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import logoImg from 'assets/images/logo/fiuni.png';
 
 // ==============================|| AUTH BLUR BACK SVG ||============================== //
 
@@ -17,7 +18,8 @@ export default function AuthBackground() {
         transform: 'inherit'
       }}
     >
-      <svg width="100%" height="calc(100vh - 175px)" viewBox="0 0 405 809" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <img src={logoImg} alt="Background" style={{ width: '100%', height: 'calc(100vh - 200px)', objectFit: 'cover', viewBox: "0 0 405 809", fill: "none" }} />
+      {/* <svg width="100%" height="calc(100vh - 175px)" viewBox="0 0 405 809" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M-358.39 358.707L-293.914 294.23L-293.846 294.163H-172.545L-220.81 342.428L-233.272 354.889L-282.697 404.314L-276.575 410.453L0.316589 687.328L283.33 404.314L233.888 354.889L230.407 351.391L173.178 294.163H294.48L294.547 294.23L345.082 344.765L404.631 404.314L0.316589 808.629L-403.998 404.314L-358.39 358.707ZM0.316589 0L233.938 233.622H112.637L0.316589 121.301L-112.004 233.622H-233.305L0.316589 0Z"
           fill={theme.palette.primary.light}
@@ -32,7 +34,7 @@ export default function AuthBackground() {
           fill={theme.palette.error.lighter}
           opacity="1"
         />
-      </svg>
+      </svg> */}
     </Box>
   );
 }

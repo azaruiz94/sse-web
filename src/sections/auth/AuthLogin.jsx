@@ -81,9 +81,12 @@ export default function AuthLogin({ isDemo = false }) {
                     name="email"
                     onBlur={handleBlur}
                     onChange={(e) => {
-                                handleChange(e);  // From Formik
-                                setForm({ ...form, [e.target.name]: e.target.value }); // Your custom logic
-                              }}
+                      handleChange(e);
+                      setForm({ ...form, [e.target.name]: e.target.value });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSubmit(e);
+                    }}
                     placeholder="Enter email address"
                     fullWidth
                     error={Boolean(touched.email && errors.email)}
@@ -107,9 +110,12 @@ export default function AuthLogin({ isDemo = false }) {
                     name="password"
                     onBlur={handleBlur}
                     onChange={(e) => {
-                                handleChange(e);  // From Formik
-                                setForm({ ...form, [e.target.name]: e.target.value }); // Your custom logic
-                              }}
+                      handleChange(e);
+                      setForm({ ...form, [e.target.name]: e.target.value });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSubmit(e);
+                    }}
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton
@@ -132,7 +138,7 @@ export default function AuthLogin({ isDemo = false }) {
                   </FormHelperText>
                 )}
               </Grid>
-              <Grid sx={{ mt: -1 }} size={12}>
+{/*               <Grid sx={{ mt: -1 }} size={12}>
                 <Stack direction="row" sx={{ gap: 2, alignItems: 'baseline', justifyContent: 'space-between' }}>
                   <FormControlLabel
                     control={
@@ -150,7 +156,7 @@ export default function AuthLogin({ isDemo = false }) {
                     Forgot Password?
                   </Link>
                 </Stack>
-              </Grid>
+              </Grid> */}
               <Grid size={12}>
                 <AnimateButton>
                   <Button fullWidth size="large" variant="contained" color="primary" onClick={handleSubmit}>
