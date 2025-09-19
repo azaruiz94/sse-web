@@ -17,9 +17,14 @@ export default function UploadResolutionFile({ open, onClose, onUpload }) {
             onChange={e => setFile(e.target.files[0])}
           />
         </Button>
+
+        <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+          Tamaño máximo permitido: 5 MB. Solo se permiten archivos PDF.
+        </Typography>
+
         {file && (
           <Typography variant="body2" mt={2}>
-            Archivo seleccionado: {file.name}
+            Archivo seleccionado: {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
           </Typography>
         )}
       </DialogContent>

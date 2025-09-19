@@ -30,21 +30,21 @@ const CreateDependencyModal = ({ open, onClose }) => {
   const handleSubmit = async () => {
     try {
       await dispatch(createDependency(formData)).unwrap();
-      enqueueSnackbar('Dependency created successfully', { variant: 'success' });
+      enqueueSnackbar('Dependencia creada con éxito', { variant: 'success' });
       onClose();
       setFormData({ name: '' }); // reset
     } catch (err) {
-      enqueueSnackbar(err || 'Failed to create dependency', { variant: 'error' });
+      enqueueSnackbar(err || 'Error al crear la dependencia', { variant: 'error' });
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Create New Dependency</DialogTitle>
+      <DialogTitle>Crear Nueva Dependencia</DialogTitle>
       <DialogContent dividers>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="Name"
+            label="Nombre"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -53,8 +53,8 @@ const CreateDependencyModal = ({ open, onClose }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSubmit}>Create</Button>
+        <Button onClick={onClose}>Cancelar</Button>
+        <Button variant="contained" onClick={handleSubmit}>Crear</Button>
       </DialogActions>
     </Dialog>
   );

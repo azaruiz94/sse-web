@@ -41,11 +41,11 @@ import { createState } from '../../store/slices/statesSlice';
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Create New State</DialogTitle>
+      <DialogTitle>Create Nuevo Estado</DialogTitle>
       <DialogContent dividers>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="Name"
+            label="Nombre"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -54,8 +54,8 @@ import { createState } from '../../store/slices/statesSlice';
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSubmit}>Create</Button>
+        <Button onClick={onClose}>Cancelar</Button>
+        <Button variant="contained" onClick={handleSubmit}>Crear</Button>
       </DialogActions>
     </Dialog>
   );

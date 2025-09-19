@@ -40,7 +40,8 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     rehydrated: !!token,
-    serverDown: false
+    serverDown: false,
+    sessionExpired: false
   },
   reducers: {
     logout: (state) => {
@@ -49,6 +50,10 @@ const authSlice = createSlice({
       localStorage.removeItem('authToken');
       localStorage.removeItem('authUser');
       state.rehydrated = true;
+    },
+    // Set sessionExpired flag; PrivateRoute reacts to this and performs logout/navigation
+    setSessionExpired: (state, action) => {
+      state.sessionExpired = action.payload === undefined ? true : !!action.payload;
     },
     loadUserFromStorage: (state) => {
       const token = localStorage.getItem('authToken');
@@ -127,5 +132,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, loadUserFromStorage } = authSlice.actions;
+export const { logout, loadUserFromStorage, setSessionExpired } = authSlice.actions;
 export default authSlice.reducer;

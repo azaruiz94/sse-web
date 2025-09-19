@@ -55,7 +55,7 @@ const TemplatesTable = forwardRef((props, ref) => {
     { field: 'name', headerName: 'Nombre', width: 300 },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: 'Acciones',
       width: 150,
       sortable: false,
       renderCell: (params) => (

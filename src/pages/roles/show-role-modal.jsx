@@ -29,7 +29,7 @@ const PERMISSION_GROUPS = [
   { label: 'Expedientes', keyword: 'EXPEDIENTE' },
   { label: 'Resoluciones', keyword: 'RESOLUCION' },
   { label: 'Auditoria', keyword: 'AUDITORIA' },
-  { label: 'Other', keyword: null }
+  { label: 'Otros', keyword: null }
 ];
 
 const groupPermissions = (permissions) => {
@@ -44,7 +44,7 @@ const groupPermissions = (permissions) => {
     if (foundGroup) {
       grouped[foundGroup.label].push(perm);
     } else {
-      grouped['Other'].push(perm);
+      grouped['Otros'].push(perm);
     }
   });
   return grouped;
@@ -92,7 +92,7 @@ const ShowRoleModal = ({ open, onClose, role }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Role Permissions</DialogTitle>
+      <DialogTitle>Permisos del Rol</DialogTitle>
       <DialogContent dividers>
         {!hasVerPermisos && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -128,7 +128,7 @@ const ShowRoleModal = ({ open, onClose, role }) => {
               </Box>
             )
           ))}
-          <Typography sx={{ mt: 2 }}><strong>Users with this role:</strong></Typography>
+          <Typography sx={{ mt: 2 }}><strong>Usuarios con este rol:</strong></Typography>
           {usersWithRole.length > 0 ? (
             <List dense>
               {usersWithRole.map(user => (
@@ -150,7 +150,7 @@ const ShowRoleModal = ({ open, onClose, role }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Close</Button>
+        <Button onClick={onClose} color="primary">Cerrar</Button>
       </DialogActions>
     </Dialog>
   );

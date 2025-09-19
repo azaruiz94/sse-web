@@ -7,7 +7,6 @@ import {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRecordsByPage, searchRecords } from 'store/slices/recordsSlice';
-import { fetchApplicants } from 'store/slices/applicantsSlice';
 import { fetchStates } from 'store/slices/statesSlice';
 import { fetchDependencies } from 'store/slices/dependenciesSlice';
 import { DataGrid } from '@mui/x-data-grid';
@@ -70,7 +69,6 @@ const RecordsTable = forwardRef((props, ref) => {
   }, [dispatch, page, searchTerm]);
 
   useEffect(() => {
-    dispatch(fetchApplicants());
     dispatch(fetchStates());
     dispatch(fetchDependencies());
   }, [dispatch]);
@@ -80,10 +78,10 @@ const RecordsTable = forwardRef((props, ref) => {
   }, [navigate]);
 
   const columns = [
-    { field: 'number', headerName: 'Number', width: 120 },
+    { field: 'number', headerName: 'Nro. expediente', width: 120 },
     {
       field: 'applicant',
-      headerName: 'Applicant',
+      headerName: 'Solicitante',
       width: 200,
       valueGetter: (params) => {
         const applicant = params;
@@ -95,7 +93,7 @@ const RecordsTable = forwardRef((props, ref) => {
     },
     {
       field: 'stateId',
-      headerName: 'State',
+      headerName: 'Estado actual',
       width: 120,
       valueGetter: (params) => {
         const state = states.find(s => s.id === params);
@@ -104,7 +102,7 @@ const RecordsTable = forwardRef((props, ref) => {
     },
     {
       field: 'dependencyId',
-      headerName: 'Dependency',
+      headerName: 'Dependencia actual',
       width: 150,
       valueGetter: (params) => {
         const dep = dependencies.find(d => d.id === params);
@@ -112,8 +110,17 @@ const RecordsTable = forwardRef((props, ref) => {
       }
     },
     {
+      field: 'registeredDate',
+      headerName: 'Fecha de registro',
+      width: 150,
+      valueGetter: (params) =>
+        params
+          ? new Date(params).toLocaleString()
+          : ''
+    },
+    {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: 'Acciones',
       width: 150,
       sortable: false,
       renderCell: (params) => (
@@ -145,7 +152,6 @@ const RecordsTable = forwardRef((props, ref) => {
               paginationModel={{ page, pageSize: 5 }}
               onPaginationModelChange={({ page: newPage }) => {
                 setPage(newPage);
-                dispatch(fetchRecordsByPage(newPage + 1));
               }}
               disableSelectionOnClick
               getRowId={(row) => row.id}

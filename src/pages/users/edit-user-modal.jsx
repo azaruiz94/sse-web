@@ -88,7 +88,7 @@ const EditUserModal = ({ open, onClose, user }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Edit User</DialogTitle>
+      <DialogTitle>Editar Usuario</DialogTitle>
       <DialogContent dividers>
         {showAlert && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -103,35 +103,35 @@ const EditUserModal = ({ open, onClose, user }) => {
         )}
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="First Name"
+            label="Nombre"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Last Name"
+            label="Apellido"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Email"
+            label="Correo"
             name="email"
             value={formData.email}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Phone"
+            label="Teléfono"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Document"
+            label="Nro. Documento"
             name="document"
             value={formData.document}
             onChange={handleChange}
@@ -166,7 +166,7 @@ const EditUserModal = ({ open, onClose, user }) => {
           {hasVerDependencia && (
             <TextField
               select
-              label="Dependency"
+              label="Dependencia"
               name="dependencyId"
               value={formData.dependencyId}
               onChange={handleChange}
@@ -201,9 +201,9 @@ const EditUserModal = ({ open, onClose, user }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button variant="contained" onClick={handleSubmit}>
-          Save
+          Guardar
         </Button>
       </DialogActions>
     </Dialog>

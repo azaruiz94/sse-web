@@ -47,7 +47,7 @@ export default function RecordsPage() {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Stack direction="row" spacing={1}>
           <TextField
-            placeholder="Buscar expedientes"
+            placeholder="Número de expediente/documento"
             size="small"
             value={searchTerm}
             onChange={(e) => {

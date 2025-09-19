@@ -40,20 +40,6 @@ export const fetchRecordById = createAsyncThunk(
   }
 );
 
-// Async thunk for fetching the next record number
-export const fetchNextRecordNumber = createAsyncThunk(
-  'records/fetchNextRecordNumber',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await api.get('/records/next-number');
-      // Make sure the backend returns { number: ... }
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
-  }
-);
-
 // Async thunk for forwarding a record
 export const forwardRecord = createAsyncThunk(
   'records/forwardRecord',
@@ -119,7 +105,7 @@ const recordsSlice = createSlice({
     loading: false,
     error: null,
     selectedRecord: null,
-    nextRecordNumber: null,
+    // server assigns number and created date
     searchResults: [],
     searchLoading: false,
     fileUrl: null,
@@ -170,19 +156,7 @@ const recordsSlice = createSlice({
         state.error = action.payload;
         state.selectedRecord = null;
       })
-      .addCase(fetchNextRecordNumber.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchNextRecordNumber.fulfilled, (state, action) => {
-        state.loading = false;
-        state.nextRecordNumber = action.payload.number;
-      })
-      .addCase(fetchNextRecordNumber.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-        state.nextRecordNumber = null;
-      })
+      
       .addCase(forwardRecord.pending, (state) => {
         state.loading = true;
         state.error = null;

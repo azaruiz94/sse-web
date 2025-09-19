@@ -47,7 +47,7 @@ export default function ResolutionsPage() {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Stack direction="row" spacing={1}>
           <TextField
-            placeholder="Buscar resoluciones"
+            placeholder="Numero de resolución/documento"
             size="small"
             value={searchTerm}
             onChange={(e) => {

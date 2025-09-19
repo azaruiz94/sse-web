@@ -10,7 +10,6 @@ import TemplatesTable from './templates-table';
 
 export default function TemplatesPage() {
   const tableRef = useRef();
-  const loading = useSelector(state => state.templates.loading);
   const navigate = useNavigate();
 
   return (

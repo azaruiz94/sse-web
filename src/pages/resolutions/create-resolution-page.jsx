@@ -218,7 +218,7 @@ export default function CreateResolutionPage() {
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" mb={2}>Generar Resolución</Typography>
+        <Typography variant="h5" mb={2}>Nueva Resolución</Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 12 }}>
             <Box display="flex" justifyContent="flex-end">
@@ -254,7 +254,7 @@ export default function CreateResolutionPage() {
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField
-              label="Issued Date"
+              label="Fecha de emisión"
               name="issuedDate"
               type="datetime-local"
               value={form.issuedDate}
@@ -266,7 +266,7 @@ export default function CreateResolutionPage() {
           </Grid>
           <Grid size={{ xs: 12, md: 12 }}>
             <TextField
-              label="Buscar expediente por número o número de documento del solicitante"
+              label="Buscar por número de expediente o número de documento del solicitante"
               value={recordSearch}
               onChange={handleRecordSearchChange}
               onKeyDown={handleRecordSearchKeyDown}
@@ -323,7 +323,7 @@ export default function CreateResolutionPage() {
           <Grid size={{ xs: 12, md: 12 }}>
             <Box mt={2} mb={1}>
               <Typography variant="subtitle1" gutterBottom>
-                Content
+                Contenido
               </Typography>
               <CKEditor
                 editor={ClassicEditor}
@@ -379,7 +379,7 @@ export default function CreateResolutionPage() {
                 color="primary"
                 disabled={loading}
               >
-                {loading ? 'Saving...' : 'Create'}
+                {loading ? 'Guardando...' : 'Crear Resolución'}
               </Button>
             </Box>
           </Grid>

@@ -44,10 +44,10 @@ const RolesTable = forwardRef((props, ref) => {
   };
 
   const columns = [
-    { field: 'name', headerName: 'Name', width: 250 },
+    { field: 'name', headerName: 'Nombre', width: 250 },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: 'Acciones',
       width: 120,
       sortable: false,
       renderCell: (params) => (

@@ -1,6 +1,6 @@
 // material-ui
 import { PlusOutlined } from '@ant-design/icons';
-import { Box, Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 
 // project imports
 import MainCard from 'components/MainCard';
@@ -12,7 +12,8 @@ export default function StatesPage() {
   const tableRef = useRef();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   return (
-    <MainCard title="Estados de expedientes"
+    <MainCard 
+      title="Estado de expedientes"
       secondary={
         <Button
           variant="contained"

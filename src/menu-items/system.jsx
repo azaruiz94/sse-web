@@ -47,8 +47,8 @@ const getSystemMenu = (permissions = []) => {
       breadcrumbs: false
     },
     permissions.includes('VER_RESOLUCION') && {
-      id: 'templates',
-      title: 'Templates',
+      id: 'plantillas',
+      title: 'Plantillas',
       type: 'item',
       url: '/templates',
       icon: icons.BarsOutlined,

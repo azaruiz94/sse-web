@@ -105,12 +105,12 @@ const ShowRecordPage = () => {
     setForwardLoading(true);
     try {
       await dispatch(forwardRecord(payload)).unwrap();
-      enqueueSnackbar("Expediente reenviado correctamente", { variant: "success" });
+      enqueueSnackbar("Expediente remitido correctamente", { variant: "success" });
       setForwardModalOpen(false);
       // Optionally refetch the record to update history
       dispatch(fetchRecordById(record.id));
     } catch (err) {
-      enqueueSnackbar("Error al reenviar expediente", { variant: "error" });
+      enqueueSnackbar("Error al remitir expediente", { variant: "error" });
     } finally {
       setForwardLoading(false);
     }
@@ -147,7 +147,7 @@ const ShowRecordPage = () => {
           </Button>
         </Box>
         <Typography variant="h5" gutterBottom>
-          Detalles de expediente
+          Detalles del expediente
         </Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 8 }}>

@@ -19,6 +19,7 @@ const EditApplicantModal = ({ open, onClose, applicant }) => {
   const [formData, setFormData] = useState({
     id: '',
     names: '',
+    document: '',
     mail: '',
     address: '',
     phone: ''
@@ -49,32 +50,39 @@ const EditApplicantModal = ({ open, onClose, applicant }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Edit Applicant</DialogTitle>
+      <DialogTitle>Editar Solicitante</DialogTitle>
       <DialogContent dividers>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="Name"
+            label="Nombre completo"
             name="names"
             value={formData.names}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Email"
+            label="Nro. Documento"
+            name="document"
+            value={formData.document}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            label="Correo"
             name="mail"
             value={formData.mail}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Address"
+            label="Dirección"
             name="address"
             value={formData.address}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Phone"
+            label="Teléfono"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
@@ -83,9 +91,9 @@ const EditApplicantModal = ({ open, onClose, applicant }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button variant="contained" onClick={handleSubmit}>
-          Save
+          Guardar
         </Button>
       </DialogActions>
     </Dialog>

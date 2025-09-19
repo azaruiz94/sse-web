@@ -29,7 +29,7 @@ const PERMISSION_GROUPS = [
   { label: 'Resoluciones', keyword: 'RESOLUCION' },
   { label: 'Auditoria', keyword: 'AUDITORIA' },
   // Add more groups as needed
-  { label: 'Other', keyword: null }
+  { label: 'Otros', keyword: null }
 ];
 
 const groupPermissions = (permissions) => {
@@ -44,7 +44,7 @@ const groupPermissions = (permissions) => {
     if (foundGroup) {
       grouped[foundGroup.label].push(perm);
     } else {
-      grouped['Other'].push(perm);
+      grouped['Otros'].push(perm);
     }
   });
   return grouped;
@@ -89,11 +89,11 @@ const CreateRoleModal = ({ open, onClose }) => {
   const handleSubmit = async () => {
     try {
       await dispatch(createRole(formData)).unwrap();
-      enqueueSnackbar('Role created successfully', { variant: 'success' });
+      enqueueSnackbar('Rol creado exitosamente', { variant: 'success' });
       onClose();
       setFormData({ name: '', permissionIds: [] }); // reset
     } catch (err) {
-      enqueueSnackbar(err || 'Failed to create role', { variant: 'error' });
+      enqueueSnackbar(err || 'Error al crear rol', { variant: 'error' });
     }
   };
 
@@ -110,7 +110,7 @@ const CreateRoleModal = ({ open, onClose }) => {
   if (!rehydrated) {
     return (
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-        <DialogTitle>Create New Role</DialogTitle>
+        <DialogTitle>Crear Nuevo Rol</DialogTitle>
         <DialogContent dividers>
           <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
             <Typography>Cargando usuario...</Typography>
@@ -127,7 +127,7 @@ const CreateRoleModal = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Create New Role</DialogTitle>
+      <DialogTitle>Crear Nuevo Rol</DialogTitle>
       <DialogContent dividers>
         {user && !hasVerPermisos && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -136,7 +136,7 @@ const CreateRoleModal = ({ open, onClose }) => {
         )}
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="Name"
+            label="Nombre"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -171,9 +171,9 @@ const CreateRoleModal = ({ open, onClose }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button variant="contained" onClick={handleSubmit} disabled={!hasVerPermisos}>
-          Create
+          Crear
         </Button>
       </DialogActions>
     </Dialog>

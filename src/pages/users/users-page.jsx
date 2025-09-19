@@ -43,7 +43,7 @@ export default function UsersPage() {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Stack direction="row" spacing={1}>
           <TextField
-            placeholder="Buscar por correo o numero de documento"
+            placeholder="Correo o numero de documento"
             size="small"
             value={searchTerm}
             onChange={(e) => {

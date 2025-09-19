@@ -73,13 +73,14 @@ const ApplicantsTable = forwardRef((props, ref) => {
   };
 
   const columns = [
-    { field: 'names', headerName: 'Name', width: 200 },
-    { field: 'mail', headerName: 'Email', width: 250 },
-    { field: 'address', headerName: 'Address', width: 200 },
-    { field: 'phone', headerName: 'Phone', width: 150 },
+    { field: 'names', headerName: 'Nombre', width: 200 },
+    { field: 'mail', headerName: 'Correo', width: 250 },
+    { field: 'address', headerName: 'Dirección', width: 200 },
+    { field: 'phone', headerName: 'Teléfono', width: 150 },
+    { field: 'document', headerName: 'Nro. Documento', width: 150 },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: 'Acciones',
       width: 150,
       sortable: false,
       renderCell: (params) => (

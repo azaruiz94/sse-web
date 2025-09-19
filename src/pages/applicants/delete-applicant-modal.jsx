@@ -15,25 +15,24 @@ const DeleteApplicantModal = ({ open, onClose, applicant, onConfirm }) => {
       fullWidth
       maxWidth="xs"
     >
-      <DialogTitle>Confirm Deletion</DialogTitle>
+      <DialogTitle>Confirmar Eliminación</DialogTitle>
       <DialogContent dividers>
         {applicant ? (
           <Typography>
-            Are you sure you want to delete applicant{' '}
-            <strong>{applicant.names}</strong>?
+            ¿Seguro que desea eliminar a{' '}<strong>{applicant.names}</strong>{' '} del sistema?
           </Typography>
         ) : (
-          <Typography>Loading...</Typography>
+          <Typography>Cargando...</Typography>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button
           onClick={onConfirm}
           color="error"
           variant="contained"
         >
-          Delete
+          Eliminar
         </Button>
       </DialogActions>
     </Dialog>

@@ -116,12 +116,11 @@ const UsersTable = forwardRef((props, ref) => {
   }));
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 80 },
-    { field: 'firstName', headerName: 'First Name', width: 150 },
-    { field: 'lastName', headerName: 'Last Name', width: 150 },
-    { field: 'email', headerName: 'Email', width: 200 },
-    { field: 'phone', headerName: 'Phone', width: 140 },
-    { field: 'document', headerName: 'Document', width: 140 },
+    { field: 'firstName', headerName: 'Nombre', width: 150 },
+    { field: 'lastName', headerName: 'Apellido', width: 150 },
+    { field: 'email', headerName: 'Correo Electrónico', width: 200 },
+    { field: 'phone', headerName: 'Teléfono', width: 140 },
+    { field: 'document', headerName: 'Documento', width: 140 },
     ...(hasVerRol ? [{
       field: 'roleIds',
       headerName: 'Roles',
@@ -139,17 +138,17 @@ const UsersTable = forwardRef((props, ref) => {
     }] : []),
     ...(hasVerDependencia ? [{
       field: 'dependencyId',
-      headerName: 'Dependency',
+      headerName: 'Dependencia',
       width: 180,
       valueGetter: (params) => {
         const dep = dependencies.find(d => String(d.id) === String(params));
         return dep ? dep.name : params ?? '-';
       }
     }] : []),
-    { field: 'enabled', headerName: 'Enabled', width: 100, type: 'boolean' },
+    { field: 'enabled', headerName: 'Activado', width: 100, type: 'boolean' },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: 'Acciones',
       width: 150,
       sortable: false,
       renderCell: (params) => (

@@ -16,6 +16,7 @@ import { createApplicant } from '../../store/slices/applicantsSlice';
   const { enqueueSnackbar } = useSnackbar();
   const [formData, setFormData] = useState({
     names: '',
+    document: '',
     mail: '',
     address: '',
     phone: ''
@@ -35,7 +36,7 @@ import { createApplicant } from '../../store/slices/applicantsSlice';
       await dispatch(createApplicant(formData)).unwrap();
       enqueueSnackbar('Applicant created successfully', { variant: 'success' });
       onClose();
-      setFormData({ names: '', mail: '', address: '', phone: '' }); // reset
+      setFormData({ names: '', document: '', mail: '', address: '', phone: '' }); // reset
     } catch (err) {
       enqueueSnackbar(err || 'Failed to create applicant', { variant: 'error' });
     }
@@ -44,32 +45,39 @@ import { createApplicant } from '../../store/slices/applicantsSlice';
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Create New Applicant</DialogTitle>
+      <DialogTitle>Nuevo Solicitante</DialogTitle>
       <DialogContent dividers>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="Name"
+            label="Nombre completo"
             name="names"
             value={formData.names}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Email"
+            label="Nro. Documento"
+            name="document"
+            value={formData.document}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            label="Correo"
             name="mail"
             value={formData.mail}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Address"
+            label="Dirección"
             name="address"
             value={formData.address}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Phone"
+            label="Teléfono"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
@@ -78,8 +86,8 @@ import { createApplicant } from '../../store/slices/applicantsSlice';
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSubmit}>Create</Button>
+        <Button onClick={onClose}>Cancelar</Button>
+        <Button variant="contained" onClick={handleSubmit}>Crear</Button>
       </DialogActions>
     </Dialog>
   );

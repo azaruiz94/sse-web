@@ -20,7 +20,7 @@ const StatesTable = forwardRef((props, ref) => {
   const page = useSelector((state) => state.states.page);
   const loading = useSelector((state) => state.states.loading);
   const columns = [
-    { field: 'name', headerName: 'Name', width: 200 }
+    { field: 'name', headerName: 'Nombre', width: 200 }
   ];
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const StatesTable = forwardRef((props, ref) => {
               rowCount={total}
               loading={loading}
               pageSizeOptions={[50]}
-              paginationModel={{ page, pageSize: 5 }}
+              paginationModel={{ page, pageSize: 50 }}
               onPaginationModelChange={({ page: newPage }) => {
                 dispatch(fetchStates(newPage));
               }}

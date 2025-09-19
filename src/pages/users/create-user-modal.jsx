@@ -74,7 +74,7 @@ const CreateUserModal = ({ open, onClose }) => {
   const handleSubmit = async () => {
     try {
       await dispatch(createUser(formData)).unwrap();
-      enqueueSnackbar('User created successfully', { variant: 'success' });
+      enqueueSnackbar('Usuario creado exitosamente', { variant: 'success' });
       onClose();
       setFormData({
         firstName: '',
@@ -88,7 +88,7 @@ const CreateUserModal = ({ open, onClose }) => {
         enabled: true
       }); // reset
     } catch (err) {
-      enqueueSnackbar(err || 'Failed to create user', { variant: 'error' });
+      enqueueSnackbar(err || 'Error al crear usuario', { variant: 'error' });
     }
   };
 
@@ -103,21 +103,21 @@ const CreateUserModal = ({ open, onClose }) => {
         )}
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="First Name"
+            label="Nombre"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Last Name"
+            label="Apellido"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Password"
+            label="Contraseña"
             name="password"
             type="password"
             value={formData.password}
@@ -125,21 +125,21 @@ const CreateUserModal = ({ open, onClose }) => {
             fullWidth
           />
           <TextField
-            label="Email"
+            label="Correo"
             name="email"
             value={formData.email}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Phone"
+            label="Teléfono"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Document"
+            label="Nro. Documento"
             name="document"
             value={formData.document}
             onChange={handleChange}
@@ -171,7 +171,7 @@ const CreateUserModal = ({ open, onClose }) => {
           </FormControl>
           <TextField
             select
-            label="Dependency"
+            label="Dependencia"
             name="dependencyId"
             value={formData.dependencyId}
             onChange={handleChange}
@@ -187,9 +187,9 @@ const CreateUserModal = ({ open, onClose }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button variant="contained" onClick={handleSubmit} disabled={!hasVerRol || !hasVerDependencia}>
-          Create
+          Crear
         </Button>
       </DialogActions>
     </Dialog>

@@ -63,10 +63,10 @@ const ResolutionsTable = forwardRef((props, ref) => {
   }, [dispatch, page, searchTerm]);
 
   const columns = [
-    { field: 'number', headerName: 'Number', width: 120 },
+    { field: 'number', headerName: 'Número', width: 120 },
     {
       field: 'issuedDate',
-      headerName: 'Issued Date',
+      headerName: 'Fecha de emisión',
       width: 180,
       valueFormatter: (params) => {
         const date = params ? new Date(params) : null;
@@ -112,8 +112,29 @@ const ResolutionsTable = forwardRef((props, ref) => {
         )
     },
     {
+      field: 'recordSummary',
+      headerName: 'Nro. expediente',
+      width: 220,
+      valueGetter: (params) =>
+        params
+          ? `${params.number ? params.number : '-'}`
+          : '-'
+    },
+    {
+      field: 'recordSummarySolicitante',
+      headerName: 'Solicitante',
+      width: 220,
+      renderCell: (params) => {
+        const summary = params.row?.recordSummary;
+        return summary
+          ? `${summary.applicantNames} (${summary.applicantDocument})`
+          : '-';
+      }
+    },
+    
+    {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: 'Acciones',
       width: 160,
       sortable: false,
       renderCell: (params) => (

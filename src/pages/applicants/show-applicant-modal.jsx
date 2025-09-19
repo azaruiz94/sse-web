@@ -11,21 +11,22 @@ import {
 const ShowApplicantModal = ({ open, onClose, applicant }) => {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Applicant Details</DialogTitle>
+      <DialogTitle>Detalles del Solicitante</DialogTitle>
       <DialogContent dividers>
         {applicant ? (
           <Box>
-            <Typography><strong>Name:</strong> {applicant.names}</Typography>
-            <Typography><strong>Email:</strong> {applicant.mail}</Typography>
-            <Typography><strong>Address:</strong> {applicant.address}</Typography>
-            <Typography><strong>Phone:</strong> {applicant.phone}</Typography>
+            <Typography><strong>Nombre:</strong> {applicant.names}</Typography>
+            <Typography><strong>Nro. Documento:</strong> {applicant.document}</Typography>
+            <Typography><strong>Correo:</strong> {applicant.mail}</Typography>
+            <Typography><strong>Dirección:</strong> {applicant.address}</Typography>
+            <Typography><strong>Teléfono:</strong> {applicant.phone}</Typography>
           </Box>
         ) : (
           <Typography>Loading...</Typography>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Close</Button>
+        <Button onClick={onClose} color="primary">Cerrar</Button>
       </DialogActions>
     </Dialog>
   );

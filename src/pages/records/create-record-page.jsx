@@ -4,7 +4,7 @@ import { Box, Button, TextField, Paper, Typography, Grid, CircularProgress, Form
 import { fetchApplicants, searchApplicants } from 'store/slices/applicantsSlice';
 import { fetchStates } from 'store/slices/statesSlice';
 import { fetchDependencies } from 'store/slices/dependenciesSlice';
-import { createRecord, fetchNextRecordNumber, uploadRecordPdf } from 'store/slices/recordsSlice';
+import { createRecord, uploadRecordPdf } from 'store/slices/recordsSlice';
 import { useSnackbar } from 'notistack';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useNavigate } from 'react-router-dom';
@@ -19,18 +19,16 @@ export default function CreateRecordPage() {
   const applicantsLoading = useSelector(state => state.applicants.loading);
   const states = useSelector(state => state.states.list);
   const dependencies = useSelector(state => state.dependencies.list);
-  const nextRecordNumber = useSelector(state => state.records.nextRecordNumber);
   const loading = useSelector(state => state.records.loading);
   const error = useSelector(state => state.records.error);
 
   // Local state
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [number, setNumber] = useState('');
   const [internal, setInternal] = useState(true); // true = "Interno" checked by default
   const [motive, setMotive] = useState('');
   const [filePath, setFilePath] = useState('');
-  const [registeredDate, setRegisteredDate] = useState(new Date().toISOString().slice(0, 16)); // ISO string for datetime-local
+  // server will assign number and registeredDate
   const [pdfFile, setPdfFile] = useState(null);
 
   // Fetch data on mount
@@ -38,15 +36,8 @@ export default function CreateRecordPage() {
     dispatch(fetchApplicants());
     dispatch(fetchStates());
     dispatch(fetchDependencies());
-    dispatch(fetchNextRecordNumber());
   }, [dispatch]);
 
-  // Update local number state when nextRecordNumber changes
-  useEffect(() => {
-    if (nextRecordNumber !== null && nextRecordNumber !== undefined) {
-      setNumber(String(nextRecordNumber));
-    }
-  }, [nextRecordNumber]);
 
   // Search applicants
   useEffect(() => {
@@ -69,8 +60,7 @@ export default function CreateRecordPage() {
 
     // Prepare record payload
     const recordPayload = {
-      number,
-      registeredDate: new Date(registeredDate).toISOString(),
+      // number and registeredDate are assigned by the server
       filePath,
       internal,
       applicantId: selectedApplicant.id,
@@ -87,7 +77,12 @@ export default function CreateRecordPage() {
           const recordId = action.payload.id;
           const formData = new FormData();
           formData.append('file', pdfFile);
-          await dispatch(uploadRecordPdf({ id: recordId, file: pdfFile }));
+          const uploadAction = await dispatch(uploadRecordPdf({ id: recordId, file: formData }));
+          if (uploadRecordPdf.fulfilled.match(uploadAction)) {
+            enqueueSnackbar('PDF subido correctamente', { variant: 'success' });
+          } else {
+            enqueueSnackbar(uploadAction.error?.message || 'Error al subir PDF', { variant: 'warning' });
+          }
         }
         enqueueSnackbar('Expediente creado exitosamente', { variant: 'success' });
         navigate(`/expedientes/${action.payload.id}`);
@@ -104,7 +99,7 @@ export default function CreateRecordPage() {
       <Paper sx={{ p: 4 }}>
         <Typography variant="h5" mb={2}>Nuevo Expediente</Typography>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs: 12, md: 12 }}>
             <Autocomplete
               options={applicants}
               getOptionLabel={(option) => option.names || ''}
@@ -131,14 +126,6 @@ export default function CreateRecordPage() {
               )}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <TextField
-              label="Número"
-              value={number}
-              margin="normal"
-              fullWidth
-            />
-          </Grid>
           <Grid size={{ xs: 12, md: 12 }}>
             <TextField
               label="Motivo de solicitud/nota"
@@ -149,7 +136,7 @@ export default function CreateRecordPage() {
               margin="normal"
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, md: 12 }}>
             <TextField
               label="Dependencia"
               value={mesaEntradaDep ? mesaEntradaDep.name : ''}
@@ -158,25 +145,13 @@ export default function CreateRecordPage() {
               disabled
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, md: 12 }}>
             <TextField
               label="Estado"
               value={recibidoState ? recibidoState.name : ''}
               margin="normal"
               fullWidth
               disabled
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <TextField
-              label="Fecha de registro"
-              type="datetime-local"
-              value={registeredDate}
-              onChange={e => setRegisteredDate(e.target.value)}
-              margin="normal"
-              fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 12 }}>
@@ -214,9 +189,19 @@ export default function CreateRecordPage() {
                 onChange={e => setPdfFile(e.target.files[0])}
               />
             </Button>
-            {pdfFile && (
-              <Typography variant="body2" mt={1}>
-                Archivo seleccionado: {pdfFile.name}
+
+            {pdfFile ? (
+              <>
+                <Typography variant="body2" mt={1}>
+                  Archivo seleccionado: {pdfFile.name} ({(pdfFile.size / (1024 * 1024)).toFixed(2)} MB)
+                </Typography>
+                <Typography variant="caption" color="text.secondary" display="block">
+                  Tamaño máximo permitido: 5 MB. Solo se permiten archivos PDF.
+                </Typography>
+              </>
+            ) : (
+              <Typography variant="caption" color="text.secondary" mt={1} display="block">
+                Tamaño máximo permitido: 5 MB. Solo se permiten archivos PDF.
               </Typography>
             )}
           </Grid>
@@ -242,7 +227,7 @@ export default function CreateRecordPage() {
               color="primary"
               disabled={loading}
             >
-              {loading ? 'Saving...' : 'Crear'}
+              {loading ? 'Saving...' : 'Crear Expediente'}
             </Button>
           </Box>
         </Grid>

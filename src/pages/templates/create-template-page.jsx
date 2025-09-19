@@ -47,7 +47,7 @@ export default function CreateTemplatePage() {
     <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 4 }}>
         <Typography variant="h5" mb={2}>
-          Crear Nueva Plantilla de Resolución
+          Nueva Plantilla de Resolución
         </Typography>
         <Stack spacing={3}>
           <TextField

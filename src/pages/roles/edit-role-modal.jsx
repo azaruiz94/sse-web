@@ -28,7 +28,7 @@ const PERMISSION_GROUPS = [
   { label: 'Expedientes', keyword: 'EXPEDIENTE' },
   { label: 'Resoluciones', keyword: 'RESOLUCION' },
   { label: 'Auditoria', keyword: 'AUDITORIA' },
-  { label: 'Other', keyword: null }
+  { label: 'Otros', keyword: null }
 ];
 
 const groupPermissions = (permissions) => {
@@ -43,7 +43,7 @@ const groupPermissions = (permissions) => {
     if (foundGroup) {
       grouped[foundGroup.label].push(perm);
     } else {
-      grouped['Other'].push(perm);
+      grouped['Otros'].push(perm);
     }
   });
   return grouped;
@@ -105,10 +105,10 @@ const EditRoleModal = ({ open, onClose, role }) => {
   const handleSubmit = async () => {
     try {
       await dispatch(updateRole(formData)).unwrap();
-      enqueueSnackbar('Role updated successfully', { variant: 'success' });
+      enqueueSnackbar('Rol actualizado con éxito', { variant: 'success' });
       onClose();
     } catch (err) {
-      enqueueSnackbar(err || 'Failed to update role', { variant: 'error' });
+      enqueueSnackbar(err || 'Error al actualizar el rol', { variant: 'error' });
     }
   };
 
@@ -116,7 +116,7 @@ const EditRoleModal = ({ open, onClose, role }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Edit Role</DialogTitle>
+      <DialogTitle>Editar Rol</DialogTitle>
       <DialogContent dividers>
         {!hasVerPermisos && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -125,7 +125,7 @@ const EditRoleModal = ({ open, onClose, role }) => {
         )}
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="Name"
+            label="Nombre"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -160,9 +160,9 @@ const EditRoleModal = ({ open, onClose, role }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button variant="contained" onClick={handleSubmit} disabled={!hasVerPermisos}>
-          Save
+          Guardar
         </Button>
       </DialogActions>
     </Dialog>

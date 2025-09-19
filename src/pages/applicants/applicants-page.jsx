@@ -47,7 +47,7 @@ export default function ApplicantsPage() {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Stack direction="row" spacing={1}>
           <TextField
-            placeholder="Search applicants"
+            placeholder="Nombre o número de documento"
             size="small"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
