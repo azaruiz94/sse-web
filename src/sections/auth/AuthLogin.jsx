@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../store/slices/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import Button from '@mui/material/Button';
@@ -46,10 +47,16 @@ export default function AuthLogin({ isDemo = false }) {
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.auth);
   const [form, setForm] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
 
   const handleSubmit = e => {
     e.preventDefault();
-    dispatch(loginUser(form));
+    // Await login to ensure user is set before navigating
+    dispatch(loginUser(form)).then((res) => {
+      if (res.type === 'auth/login/fulfilled') {
+        navigate('/');
+      }
+    });
   };
 
   return (

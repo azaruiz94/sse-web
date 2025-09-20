@@ -12,13 +12,11 @@ import { fetchMe } from 'store/slices/authSlice';
 
 export default function App() {
   const dispatch = useDispatch();
-  const token = useSelector(state => state.auth.token);
 
+  // On app start, attempt to load the current user from the SESSION cookie
   useEffect(() => {
-    if (token) {
-      dispatch(fetchMe());
-    }
-  }, [token, dispatch]);
+    dispatch(fetchMe());
+  }, [dispatch]);
 
   return (
     <ThemeCustomization>

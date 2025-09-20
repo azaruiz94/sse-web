@@ -5,7 +5,6 @@ import { CircularProgress, Box, Alert } from '@mui/material';
 import { logout } from 'store/slices/authSlice';
 
 const PrivateRoute = ({ children, permission }) => {
-  const token = useSelector(state => state.auth.token);
   const user = useSelector(state => state.auth.user);
   const loading = useSelector(state => state.auth.loading);
   const serverDown = useSelector(state => state.auth.serverDown);
@@ -29,19 +28,18 @@ const PrivateRoute = ({ children, permission }) => {
       </Box>
     );
   }
-
-  // Redirect immediately if no token
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-
   // Show spinner while loading user info
-  if (loading || !user) {
+  if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
         <CircularProgress />
       </Box>
     );
+  }
+
+  // If not logged in, redirect to login
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
   // Permission check

@@ -7,6 +7,7 @@ import Loadable from 'components/Loadable';
 // jwt auth
 const LoginPage = Loadable(lazy(() => import('pages/auth/Login')));
 const RegisterPage = Loadable(lazy(() => import('pages/auth/Register')));
+const ResetPasswordPage = Loadable(lazy(() => import('pages/auth/ResetPassword')));
 
 // ==============================|| AUTH ROUTING ||============================== //
 
@@ -21,6 +22,10 @@ const LoginRoutes = {
     {
       path: 'register', // <-- remove leading slash
       element: <RegisterPage />
+    },
+    {
+      path: 'reset-password',
+      element: <ResetPasswordPage />
     }
   ]
 };

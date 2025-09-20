@@ -1,6 +1,14 @@
 import PropTypes from 'prop-types';
 import { useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import { logoutUser } from 'store/slices/authSlice';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -57,6 +65,27 @@ export default function Profile() {
   const [open, setOpen] = useState(false);
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
+  };
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const handleLogoutClick = () => {
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmOpen(false);
+  };
+
+  const handleConfirmLogout = () => {
+    // Dispatch server logout and navigate to login
+    dispatch(logoutUser()).finally(() => {
+      setConfirmOpen(false);
+      setOpen(false);
+      navigate('/login');
+    });
   };
 
   const handleClose = (event) => {
@@ -134,13 +163,23 @@ export default function Profile() {
                       </Grid>
                       <Grid>
                         <Tooltip title="Logout">
-                          <IconButton size="large" sx={{ color: 'text.primary' }}>
+                          <IconButton size="large" sx={{ color: 'text.primary' }} onClick={handleLogoutClick}>
                             <LogoutOutlined />
                           </IconButton>
                         </Tooltip>
                       </Grid>
                     </Grid>
                   </CardContent>
+                  <Dialog open={confirmOpen} onClose={handleConfirmClose}>
+                    <DialogTitle>Confirm logout</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>Are you sure you want to log out?</DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={handleConfirmClose}>Cancel</Button>
+                      <Button onClick={handleConfirmLogout} color="primary" variant="contained">Logout</Button>
+                    </DialogActions>
+                  </Dialog>
 
                   <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
