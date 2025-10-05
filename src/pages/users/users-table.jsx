@@ -21,8 +21,12 @@ import { DataGrid } from '@mui/x-data-grid';
 import {
   EyeOutlined,
   EditOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  CheckOutlined,
+  CloseOutlined
 } from '@ant-design/icons';
+import { activateUser, deactivateUser } from '../../store/slices/usersSlice';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { useSnackbar } from 'notistack';
 import {
@@ -31,7 +35,8 @@ import {
   Typography,
   CircularProgress,
   Box,
-  Alert
+  Alert,
+  Tooltip
 } from '@mui/material';
 
 const UsersTable = forwardRef((props, ref) => {
@@ -46,6 +51,10 @@ const UsersTable = forwardRef((props, ref) => {
   const loading = useSelector((state) => state.users.loading);
   const authUser = useSelector((state) => state.auth.user);
   const selectedUser = useSelector((state) => state.users.selectedUser);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [actionUser, setActionUser] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   // Permission checks
   const hasVerRol = authUser?.permissions?.includes('VER_ROL');
@@ -79,6 +88,32 @@ const UsersTable = forwardRef((props, ref) => {
     await dispatch(fetchUserById(id));
     setModalOpen(true);
   }, [dispatch]);
+
+  const handleRowToggleClick = (row) => {
+    setActionUser(row);
+    setConfirmAction(row.enabled ? 'deactivate' : 'activate');
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmRowAction = async () => {
+    if (!actionUser) return;
+    try {
+      setActionLoading(true);
+      if (confirmAction === 'activate') {
+        const resp = await dispatch(activateUser(actionUser.id)).unwrap();
+        enqueueSnackbar(resp?.message || 'User activated', { variant: 'success' });
+      } else {
+        const resp = await dispatch(deactivateUser(actionUser.id)).unwrap();
+        enqueueSnackbar(resp?.message || 'User deactivated', { variant: 'success' });
+      }
+    } catch (err) {
+      enqueueSnackbar(err || 'Action failed', { variant: 'error' });
+    } finally {
+      setActionLoading(false);
+      setConfirmOpen(false);
+      setActionUser(null);
+    }
+  };
 
   const handleEdit = (row) => {
     setEditingUser(row);
@@ -160,11 +195,35 @@ const UsersTable = forwardRef((props, ref) => {
             <EditOutlined />
           </IconButton>
           <IconButton color="error" onClick={() => handleDeleteClick(params.row)}>
-            <DeleteOutlined />
+            <DeleteOutlined /> 
           </IconButton>
         </>
       )
-    }
+    },
+    {
+      field: 'toggle',
+      headerName: 'Desactivar/Activar',
+      width: 80,
+      sortable: false,
+      renderCell: (params) => (
+        <Tooltip title={params.row.enabled ? 'Desactivar' : 'Activar'}>
+          <span>
+            <IconButton
+              color={params.row.enabled ? 'error' : 'success'}
+              onClick={() => handleRowToggleClick(params.row)}
+              disabled={!(authUser?.permissions?.includes('ACTIVAR_USUARIO') || authUser?.permissions?.includes('DESACTIVAR_USUARIO'))}
+              aria-label={params.row.enabled ? 'Desactivar usuario' : 'Activar usuario'}
+            >
+              {actionLoading && actionUser?.id === params.row.id ? (
+                <CircularProgress size={20} />
+              ) : (
+                params.row.enabled ? <CloseOutlined /> : <CheckOutlined />
+              )}
+            </IconButton>
+          </span>
+        </Tooltip>
+      )
+    },
   ];
 
   if (!hasVerUsuario) {
@@ -236,6 +295,21 @@ const UsersTable = forwardRef((props, ref) => {
           user={userToDelete}
           onConfirm={handleConfirmDelete}
         />
+        {/* Confirmation dialog for row activate/deactivate */}
+        <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+          <DialogTitle>{confirmAction === 'activate' ? 'Activar usuario' : 'Desactivar usuario'}</DialogTitle>
+          <DialogContent dividers>
+            <Box>
+              ¿Estás seguro de que deseas {confirmAction === 'activate' ? 'activar' : 'desactivar'} al usuario {actionUser?.firstName} {actionUser?.lastName}?
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmOpen(false)} disabled={actionLoading}>Cancelar</Button>
+            <Button variant="contained" color={confirmAction === 'activate' ? 'success' : 'error'} onClick={handleConfirmRowAction} disabled={actionLoading} startIcon={actionLoading ? <CircularProgress size={18} /> : null}>
+              {confirmAction === 'activate' ? 'Activar' : 'Desactivar'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </CardContent>
     </Card>
   );

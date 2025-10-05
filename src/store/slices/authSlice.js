@@ -9,16 +9,30 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       // Server sets SESSION cookie (HttpOnly). Do not expect token in JSON response.
+      // Return the full response so UI can inspect twoFaRequired/challengeId
       const res = await api.post('/auth/login', { email, password });
-      // Some backends return a `user` object even when token is null; prefer that to avoid an extra request
-      if (res.data && res.data.user) {
-        return res.data.user;
-      }
-      // Otherwise fetch authenticated user using cookie
-      const me = await api.get('/users/me');
-      return me.data;
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Confirm 2FA challenge
+export const confirmTwoFa = createAsyncThunk(
+  'auth/confirmTwoFa',
+  async ({ challengeId, code }, { rejectWithValue }) => {
+    try {
+      const res = await api.post('/auth/2fa/confirm', { challengeId, code });
+      // Backend will set SESSION cookie and return populated LoginResponseDTO (user + expiresIn)
+      return res.data;
+    } catch (err) {
+      try {
+        console.debug('[auth] confirmTwoFa error', { url: err.config?.url, status: err.response?.status, data: err.response?.data });
+      } catch (e) {}
+      const resp = err.response?.data || {};
+      const msg = resp.detail || resp.message || resp.properties?.description || err.message;
+      return rejectWithValue(msg);
     }
   }
 );
@@ -31,7 +45,14 @@ export const fetchMe = createAsyncThunk(
       const res = await api.get('/users/me');
       return res.data;
     } catch (err) {
-      return rejectWithValue(err.message || err.response?.data?.message);
+      try {
+        console.debug('[auth] fetchMe error', { url: err.config?.url, status: err.response?.status, data: err.response?.data });
+      } catch (e) {}
+      // Provide structured error info so reducers can decide how to surface it
+      const status = err.response?.status;
+      const data = err.response?.data;
+      const message = data?.message || err.message;
+      return rejectWithValue({ status, data, message });
     }
   }
 );
@@ -39,9 +60,10 @@ export const fetchMe = createAsyncThunk(
 // Async thunk for resetting password using token
 export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
-  async ({ token, password }, { rejectWithValue }) => {
+  async ({ token, password, confirmPassword }, { rejectWithValue }) => {
     try {
-      const res = await api.post('/auth/password/reset', { token, password });
+      // Backend expects { token, password, confirmPassword }
+      const res = await api.post('/auth/password/reset', { token, password, confirmPassword });
       return res.data;
     } catch (err) {
       // Prefer the backend 'detail' message (e.g. "Reset token expired or used")
@@ -70,6 +92,8 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
+    // pending challenge when twoFaRequired=true
+    pendingChallenge: null,
     loading: false,
     error: null,
     rehydrated: false,
@@ -82,6 +106,9 @@ const authSlice = createSlice({
       // Server should clear the SESSION cookie via logout endpoint; frontend just clears user
       localStorage.removeItem('authUser');
       state.rehydrated = true;
+    },
+    setPendingChallenge: (state, action) => {
+      state.pendingChallenge = action.payload;
     },
     // Set sessionExpired flag; PrivateRoute reacts to this and performs logout/navigation
     setSessionExpired: (state, action) => {
@@ -102,9 +129,19 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        // loginUser returns the user object (fetched from /users/me)
-        state.user = action.payload;
-        localStorage.setItem('authUser', JSON.stringify(action.payload));
+        // action.payload is the LoginResponseDTO; handle twoFaRequired
+        const payload = action.payload || {};
+        if (payload.twoFaRequired) {
+          state.pendingChallenge = {
+            challengeId: payload.challengeId,
+            twoFaTtlSeconds: payload.twoFaTtlSeconds,
+            emailMasked: payload.emailMasked
+          };
+        } else if (payload.user) {
+          state.user = payload.user;
+          localStorage.setItem('authUser', JSON.stringify(payload.user));
+          state.rehydrated = true;
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -118,26 +155,21 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         localStorage.setItem('authUser', JSON.stringify(action.payload));
+        state.rehydrated = true;
       })
       .addCase(fetchMe.rejected, (state, action) => {
         state.loading = false;
-        const errorMsg = action.error?.message || action.payload || '';
+        const payload = action.payload || {};
+        const status = payload.status;
+        const errorMsg = action.error?.message || payload.message || '';
         // Check for JWT expired error from backend
-        if (
-          (typeof action.payload === 'string' && action.payload.includes('expired')) ||
-          (typeof action.payload === 'object' && (
-            action.payload?.description?.includes('expired') ||
-            action.payload?.detail?.includes('expired') ||
-            action.payload?.title === 'Forbidden'
-          )) ||
-          errorMsg.includes('expired')
-        ) {
-          state.error = 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.';
+        // If the server explicitly says unauthorized/forbidden, treat as unauthenticated
+        if (status === 401 || status === 403) {
+          state.error = null; // don't show a raw 403/401 on landing
           state.serverDown = false;
           state.user = null;
           localStorage.removeItem('authUser');
-          // Optionally: set a flag to trigger redirect in your component
-          state.sessionExpired = true;
+          state.rehydrated = true;
         } else if (
           errorMsg.includes('ERR_CONNECTION_REFUSED') ||
           errorMsg.includes('Network Error') ||
@@ -146,17 +178,19 @@ const authSlice = createSlice({
           state.error = 'No se pudo conectar con el servidor. Por favor, intente más tarde.';
           state.serverDown = true;
         } else {
-          state.error = action.payload;
+          state.error = action.payload || action.error?.message;
           state.serverDown = false;
           state.user = null;
           state.token = null;
           localStorage.removeItem('authUser');
+          state.rehydrated = true;
         }
         })
         // logoutUser lifecycle
         .addCase(logoutUser.fulfilled, (state) => {
           // On successful logout, clear local user and persisted data
           state.user = null;
+          state.pendingChallenge = null;
           state.loading = false;
           state.error = null;
           localStorage.removeItem('authUser');
@@ -166,7 +200,25 @@ const authSlice = createSlice({
           state.loading = false;
           state.error = action.payload || action.error?.message;
           state.user = null;
+          state.pendingChallenge = null;
           localStorage.removeItem('authUser');
+        })
+        // confirmTwoFa lifecycle
+        .addCase(confirmTwoFa.pending, (state) => {
+          state.loading = true; state.error = null;
+        })
+        .addCase(confirmTwoFa.fulfilled, (state, action) => {
+          state.loading = false;
+          const payload = action.payload || {};
+          if (payload.user) {
+            state.user = payload.user;
+            localStorage.setItem('authUser', JSON.stringify(payload.user));
+          }
+          state.pendingChallenge = null;
+        })
+        .addCase(confirmTwoFa.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload || action.error?.message;
         })
         // resetPassword lifecycle
         .addCase(resetPassword.pending, (state) => {
@@ -185,5 +237,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, loadUserFromStorage, setSessionExpired } = authSlice.actions;
+export const { logout, loadUserFromStorage, setSessionExpired, setPendingChallenge } = authSlice.actions;
 export default authSlice.reducer;

@@ -8,6 +8,7 @@ import Loadable from 'components/Loadable';
 const LoginPage = Loadable(lazy(() => import('pages/auth/Login')));
 const RegisterPage = Loadable(lazy(() => import('pages/auth/Register')));
 const ResetPasswordPage = Loadable(lazy(() => import('pages/auth/ResetPassword')));
+const TwoFaPage = Loadable(lazy(() => import('pages/auth/TwoFa')));
 
 // ==============================|| AUTH ROUTING ||============================== //
 
@@ -19,13 +20,18 @@ const LoginRoutes = {
       path: 'login', // <-- remove leading slash
       element: <LoginPage />
     },
-    {
-      path: 'register', // <-- remove leading slash
-      element: <RegisterPage />
-    },
+    // {
+    //   path: 'register', // <-- remove leading slash
+    //   element: <RegisterPage />
+    // },
     {
       path: 'reset-password',
       element: <ResetPasswordPage />
+    }
+    ,
+    {
+      path: 'twofa',
+      element: <TwoFaPage />
     }
   ]
 };

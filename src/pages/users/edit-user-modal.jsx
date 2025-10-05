@@ -76,7 +76,12 @@ const EditUserModal = ({ open, onClose, user }) => {
 
   const handleSubmit = async () => {
     try {
-      await dispatch(updateUser(formData)).unwrap();
+      const payload = { ...formData };
+      if (!canToggleEnabled) {
+        // Ensure enabled is not sent by users without permission to toggle
+        delete payload.enabled;
+      }
+      await dispatch(updateUser(payload)).unwrap();
       enqueueSnackbar('User updated successfully', { variant: 'success' });
       onClose();
     } catch (err) {
@@ -85,6 +90,7 @@ const EditUserModal = ({ open, onClose, user }) => {
   };
 
   const showAlert = !hasVerRol || !hasVerDependencia;
+  const canToggleEnabled = authUser?.permissions?.includes('ACTIVAR_USUARIO') || authUser?.permissions?.includes('DESACTIVAR_USUARIO');
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -179,25 +185,27 @@ const EditUserModal = ({ open, onClose, user }) => {
               ))}
             </TextField>
           )}
-          <FormControl component="fieldset">
-            <Typography component="legend" sx={{ mb: 1 }}>
-              Enabled
-            </Typography>
-            <RadioGroup
-              row
-              name="enabled"
-              value={formData.enabled ? 'true' : 'false'}
-              onChange={e =>
-                setFormData(prev => ({
-                  ...prev,
-                  enabled: e.target.value === 'true'
-                }))
-              }
-            >
-              <FormControlLabel value="true" control={<Radio />} label="Sí" />
-              <FormControlLabel value="false" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
+          {canToggleEnabled && (
+            <FormControl component="fieldset">
+              <Typography component="legend" sx={{ mb: 1 }}>
+                Enabled
+              </Typography>
+              <RadioGroup
+                row
+                name="enabled"
+                value={formData.enabled ? 'true' : 'false'}
+                onChange={e =>
+                  setFormData(prev => ({
+                    ...prev,
+                    enabled: e.target.value === 'true'
+                  }))
+                }
+              >
+                <FormControlLabel value="true" control={<Radio />} label="Sí" />
+                <FormControlLabel value="false" control={<Radio />} label="No" />
+              </RadioGroup>
+            </FormControl>
+          )}
         </Box>
       </DialogContent>
       <DialogActions>

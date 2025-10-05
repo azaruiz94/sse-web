@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetPassword } from 'store/slices/authSlice';
+import { useSnackbar } from 'notistack';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
@@ -29,6 +30,7 @@ export default function AuthResetPassword() {
   const navigate = useNavigate();
   const loading = useSelector(state => state.auth.loading);
   const serverError = useSelector(state => state.auth.error);
+  const { enqueueSnackbar } = useSnackbar();
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword(prev => !prev);
@@ -52,10 +54,12 @@ export default function AuthResetPassword() {
           return;
         }
         try {
-          const action = await dispatch(resetPassword({ token, password: values.password }));
+          const action = await dispatch(resetPassword({ token, password: values.password, confirmPassword: values.confirm }));
           if (resetPassword.fulfilled.match(action)) {
             // If the backend returned a token, the slice persisted it; navigate to app
             const payload = action.payload || {};
+            // Show success snackbar
+            enqueueSnackbar('Contraseña restablecida correctamente.', { variant: 'success' });
             if (payload.token) {
               // auto-login
               navigate('/');

@@ -8,6 +8,16 @@ const api = axios.create({
 api.interceptors.response.use(
   response => response,
   error => {
+    // Log errors for debugging (don't expose to users here)
+    try {
+      console.debug('[api] response error', {
+        url: error.config?.url,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+    } catch (e) {
+      // Ignore logging failures
+    }
     if (
       error.response &&
       error.response.status === 403 &&

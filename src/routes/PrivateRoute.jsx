@@ -7,6 +7,7 @@ import { logout } from 'store/slices/authSlice';
 const PrivateRoute = ({ children, permission }) => {
   const user = useSelector(state => state.auth.user);
   const loading = useSelector(state => state.auth.loading);
+  const rehydrated = useSelector(state => state.auth.rehydrated);
   const serverDown = useSelector(state => state.auth.serverDown);
   const sessionExpired = useSelector(state => state.auth.sessionExpired);
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ const PrivateRoute = ({ children, permission }) => {
     );
   }
   // Show spinner while loading user info
-  if (loading) {
+  if (!rehydrated || loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
         <CircularProgress />

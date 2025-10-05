@@ -44,7 +44,6 @@ const CreateUserModal = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    password: '',
     email: '',
     phone: '',
     document: '',
@@ -79,7 +78,6 @@ const CreateUserModal = ({ open, onClose }) => {
       setFormData({
         firstName: '',
         lastName: '',
-        password: '',
         email: '',
         phone: '',
         document: '',
@@ -94,7 +92,7 @@ const CreateUserModal = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Create New User</DialogTitle>
+      <DialogTitle>Crear Usuario</DialogTitle>
       <DialogContent dividers>
         {(!hasVerRol || !hasVerDependencia) && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -113,14 +111,6 @@ const CreateUserModal = ({ open, onClose }) => {
             label="Apellido"
             name="lastName"
             value={formData.lastName}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Contraseña"
-            name="password"
-            type="password"
-            value={formData.password}
             onChange={handleChange}
             fullWidth
           />

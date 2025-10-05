@@ -70,6 +70,45 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+// Activate user
+export const activateUser = createAsyncThunk(
+  'users/activate',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.put(`/users/activate/${id}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Deactivate user
+export const deactivateUser = createAsyncThunk(
+  'users/deactivate',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.put(`/users/deactivate/${id}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Request password reset for a user's email (admin action)
+export const requestPasswordReset = createAsyncThunk(
+  'users/requestPasswordReset',
+  async (email, { rejectWithValue }) => {
+    try {
+      const res = await api.post('/auth/password/request', { email });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 // Search users
 export const searchUsers = createAsyncThunk(
   'users/search',
@@ -147,6 +186,32 @@ const usersSlice = createSlice({
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.list = state.list.filter(u => u.id !== action.payload);
         state.total -= 1;
+      })
+
+      // Activate
+      .addCase(activateUser.fulfilled, (state, action) => {
+        const updated = action.payload;
+        const index = state.list.findIndex(u => String(u.id) === String(updated.id));
+        if (index !== -1) state.list[index] = updated;
+        if (state.selectedUser && String(state.selectedUser.id) === String(updated.id)) {
+          state.selectedUser = updated;
+        }
+      })
+      .addCase(activateUser.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // Deactivate
+      .addCase(deactivateUser.fulfilled, (state, action) => {
+        const updated = action.payload;
+        const index = state.list.findIndex(u => String(u.id) === String(updated.id));
+        if (index !== -1) state.list[index] = updated;
+        if (state.selectedUser && String(state.selectedUser.id) === String(updated.id)) {
+          state.selectedUser = updated;
+        }
+      })
+      .addCase(deactivateUser.rejected, (state, action) => {
+        state.error = action.payload;
       })
 
       // Search

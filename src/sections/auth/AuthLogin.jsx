@@ -1,22 +1,23 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+// import { Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../store/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
+// import Checkbox from '@mui/material/Checkbox';
+// import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
+import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
+// import Link from '@mui/material/Link';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
+// import Typography from '@mui/material/Typography';
 
 // third-party
 import * as Yup from 'yup';
@@ -48,19 +49,37 @@ export default function AuthLogin({ isDemo = false }) {
   const { loading, error } = useSelector(state => state.auth);
   const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
+  const twoFaEnabled = (import.meta.env.VITE_TWOFA_ENABLED === 'true');
 
   const handleSubmit = e => {
     e.preventDefault();
     // Await login to ensure user is set before navigating
     dispatch(loginUser(form)).then((res) => {
       if (res.type === 'auth/login/fulfilled') {
-        navigate('/');
+        const payload = res.payload || {};
+        if (payload.twoFaRequired) {
+          if (twoFaEnabled) {
+            navigate('/twofa');
+          } else {
+            // Backend requires 2FA but frontend is configured to ignore it in dev.
+            // Show a friendly message and log detail for developers.
+            console.warn('Server requires 2FA but VITE_TWOFA_ENABLED is false. Enable it or use a backend without 2FA for local development.');
+            alert('El servidor requiere verificación en dos pasos. Habilita VITE_TWOFA_ENABLED en tu .env de desarrollo para continuar.');
+          }
+        } else {
+          navigate('/');
+        }
       }
     });
   };
 
   return (
     <>
+      {!twoFaEnabled && import.meta.env.MODE !== 'production' && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          2FA está deshabilitado en esta build (VITE_TWOFA_ENABLED=false). Habilítalo para probar la verificación en dos pasos.
+        </Alert>
+      )}
       <Formik
         initialValues={{
           email: '',
