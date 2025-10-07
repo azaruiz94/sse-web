@@ -20,6 +20,7 @@ import ReportAreaChart from 'sections/dashboard/default/ReportAreaChart';
 import UniqueVisitorCard from 'sections/dashboard/default/UniqueVisitorCard';
 import SaleReportCard from 'sections/dashboard/default/SaleReportCard';
 import OrdersTable from 'sections/dashboard/default/OrdersTable';
+import PendingRecordsCard from 'sections/dashboard/PendingRecordsCard';
 
 // assets
 import GiftOutlined from '@ant-design/icons/GiftOutlined';
@@ -103,6 +104,11 @@ export default function DashboardDefault() {
         </Grid>
         <MainCard sx={{ mt: 2 }} content={false}>
           <OrdersTable />
+        </MainCard>
+      </Grid>
+      <Grid size={{ xs: 12, md: 7, lg: 8 }}>
+        <MainCard sx={{ mt: 2 }} content={false}>
+          <PendingRecordsCard />
         </MainCard>
       </Grid>
       <Grid size={{ xs: 12, md: 5, lg: 4 }}>

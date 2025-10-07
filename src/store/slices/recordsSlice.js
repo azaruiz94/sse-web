@@ -79,6 +79,19 @@ export const fetchRecordFileUrl = createAsyncThunk(
   }
 );
 
+// Async thunk for fetching pending records (Recibido or En trámite)
+export const fetchPendingRecordsByPage = createAsyncThunk(
+  'records/fetchPendingRecordsByPage',
+  async (pageNum, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/records/pending/page/${pageNum}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 // Async thunk for uploading a record PDF
 export const uploadRecordPdf = createAsyncThunk(
   'records/uploadRecordPdf',
@@ -102,6 +115,8 @@ const recordsSlice = createSlice({
   initialState: {
     records: [],
     totalElements: 0,
+    pendingRecords: [],
+    pendingTotal: 0,
     loading: false,
     error: null,
     selectedRecord: null,
@@ -215,6 +230,22 @@ const recordsSlice = createSlice({
       .addCase(uploadRecordPdf.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // pending records
+      .addCase(fetchPendingRecordsByPage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPendingRecordsByPage.fulfilled, (state, action) => {
+        state.loading = false;
+        state.pendingRecords = action.payload.records || [];
+        state.pendingTotal = action.payload.totalElements || (action.payload.records ? action.payload.records.length : 0);
+      })
+      .addCase(fetchPendingRecordsByPage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.pendingRecords = [];
+        state.pendingTotal = 0;
       });
   },
 });
