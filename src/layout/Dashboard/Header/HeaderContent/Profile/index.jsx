@@ -171,17 +171,17 @@ export default function Profile() {
                     </Grid>
                   </CardContent>
                   <Dialog open={confirmOpen} onClose={handleConfirmClose}>
-                    <DialogTitle>Confirm logout</DialogTitle>
+                    <DialogTitle>Confirmar cierre de sesión</DialogTitle>
                     <DialogContent>
-                      <DialogContentText>Are you sure you want to log out?</DialogContentText>
+                      <DialogContentText>¿Estás seguro de que deseas cerrar sesión?</DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                      <Button onClick={handleConfirmClose}>Cancel</Button>
-                      <Button onClick={handleConfirmLogout} color="primary" variant="contained">Logout</Button>
+                      <Button onClick={handleConfirmClose}>Cancelar</Button>
+                      <Button onClick={handleConfirmLogout} color="primary" variant="contained">Cerrar sesión</Button>
                     </DialogActions>
                   </Dialog>
 
-                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  {/* <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
                       <Tab
                         sx={{
@@ -216,13 +216,13 @@ export default function Profile() {
                         {...a11yProps(1)}
                       />
                     </Tabs>
-                  </Box>
+                  </Box> */}
                   <TabPanel value={value} index={0} dir={theme.direction}>
                     <ProfileTab />
                   </TabPanel>
-                  <TabPanel value={value} index={1} dir={theme.direction}>
+                  {/* <TabPanel value={value} index={1} dir={theme.direction}>
                     <SettingTab />
-                  </TabPanel>
+                  </TabPanel> */}
                 </MainCard>
               </ClickAwayListener>
             </Paper>

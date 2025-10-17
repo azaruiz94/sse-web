@@ -234,19 +234,19 @@ const ShowRecordPage = () => {
         {Array.isArray(record.recordHistory) && record.recordHistory.length > 0 && (
           <Box mt={4}>
             <Typography variant="h6" gutterBottom>
-              Record History
+              Historial del expediente
             </Typography>
             <TableContainer component={Paper}>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>Updated Date</strong></TableCell>
-                    <TableCell><strong>Previous Dependency</strong></TableCell>
-                    <TableCell><strong>Next Dependency</strong></TableCell>
-                    <TableCell><strong>Previous State</strong></TableCell>
-                    <TableCell><strong>Next State</strong></TableCell>
-                    <TableCell><strong>User</strong></TableCell>
-                    <TableCell><strong>Comment</strong></TableCell>
+                    <TableCell><strong>Fecha</strong></TableCell>
+                    <TableCell><strong>Dependencia Anterior</strong></TableCell>
+                    <TableCell><strong>Dependencia Destino</strong></TableCell>
+                    <TableCell><strong>Estado Anterior</strong></TableCell>
+                    <TableCell><strong>Estado Posterior</strong></TableCell>
+                    <TableCell><strong>Usuario</strong></TableCell>
+                    <TableCell><strong>Comentario</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

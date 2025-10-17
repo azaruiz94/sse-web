@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchResolutionById, updateResolution, fetchNextResolutionNumber } from 'store/slices/resolutionsSlice';
+import { fetchResolutionById, updateResolution } from 'store/slices/resolutionsSlice';
 import { fetchTemplatesByPage } from 'store/slices/templatesSlice';
 import {
   Box,
@@ -36,11 +36,10 @@ export default function EditResolutionPage() {
   const { current: resolution, loading, error } = useSelector((state) => state.resolutions);
   const templates = useSelector((state) => state.templates.list);
   const templatesLoading = useSelector((state) => state.templates.loading);
-  const nextResolutionNumber = useSelector((state) => state.resolutions.nextResolutionNumber);
+  // number and issuedDate are assigned by the backend upon generation
 
   const [form, setForm] = useState({
-    number: '',
-    issuedDate: '',
+    recordId: '',
     recordId: '',
     content: '',
     resolvedByDean: true
@@ -57,16 +56,9 @@ export default function EditResolutionPage() {
       dispatch(fetchResolutionById(id));
       dispatch(fetchTemplatesByPage(1));
     }
-    dispatch(fetchNextResolutionNumber());
   }, [dispatch, id]);
 
   useEffect(() => {
-    // Always use the backend value for number
-    setForm((prev) => ({
-      ...prev,
-      number: nextResolutionNumber || ''
-    }));
-
     if (resolution) {
       if (resolution.resolved) {
         setSnackbarOpen(true);
@@ -76,18 +68,13 @@ export default function EditResolutionPage() {
       } else {
         setForm((prev) => ({
           ...prev,
-          issuedDate: resolution.issuedDate
-            ? typeof resolution.issuedDate === 'string'
-              ? resolution.issuedDate.slice(0, 16)
-              : new Date(resolution.issuedDate).toISOString().slice(0, 16)
-            : '',
           recordId: resolution.recordId || '',
           content: resolution.content || '',
           resolvedByDean: !!resolution.resolvedByDean
         }));
       }
     }
-  }, [resolution, id, navigate, nextResolutionNumber]);
+  }, [resolution, id, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -181,31 +168,7 @@ export default function EditResolutionPage() {
               </Tooltip>
             </Box>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <TextField
-              label="Number"
-              name="number"
-              type="number"
-              value={form.number}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <TextField
-              label="Issued Date"
-              name="issuedDate"
-              type="datetime-local"
-              value={form.issuedDate}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
+          {/* Number and Issued Date are assigned by the backend upon generation. */}
           <Grid size={{ xs: 12, md: 12 }}>
             <TextField
               label="Buscar expediente por número o número de documento del solicitante"

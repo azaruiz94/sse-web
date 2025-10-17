@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchResolutionById, uploadResolutionPdf, fetchResolutionFileUrl } from 'store/slices/resolutionsSlice';
-import { Box, Typography, Button, CircularProgress, Paper, Chip } from '@mui/material';
-import { CheckOutlined, EditOutlined } from '@ant-design/icons';
+import { fetchResolutionById, uploadResolutionPdf, fetchResolutionFileUrl, generateResolution } from 'store/slices/resolutionsSlice';
+import { withBase } from 'utils/baseUrl';
+import { fixUtf8Mojibake } from 'utils/encodingFix';
+import { Box, Typography, Button, CircularProgress, Paper, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip } from '@mui/material';
 import UploadResolutionFile from './upload-resolution-modal';
 import { useSnackbar } from 'notistack';
 
@@ -14,6 +15,8 @@ export default function ShowResolutionPage() {
   const { enqueueSnackbar } = useSnackbar();
   const [uploadOpen, setUploadOpen] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
+  const [generateLoading, setGenerateLoading] = useState(false);
+  const [generateConfirmOpen, setGenerateConfirmOpen] = useState(false);
 
   const { current: resolution, loading, error } = useSelector((state) => state.resolutions);
   const fileUrl = useSelector(state => state.resolutions.fileUrl);
@@ -24,10 +27,18 @@ export default function ShowResolutionPage() {
     }
   }, [dispatch, id]);
 
+  const canGenerate = useSelector(state => state.auth.user?.permissions?.includes('GENERAR_RESOLUCION'));
+
   const handleViewPdf = async () => {
     setFileLoading(true);
     await dispatch(fetchResolutionFileUrl(resolution.id));
     setFileLoading(false);
+  };
+
+  const handlePreview = () => {
+    if (!resolution) return;
+    const url = withBase(`/print/resoluciones/${resolution.id}`);
+    window.open(url, '_blank', 'noopener');
   };
 
   return (
@@ -39,11 +50,11 @@ export default function ShowResolutionPage() {
             onClick={() => navigate('/resoluciones')}
             sx={{ mb: 2 }}
           >
-            Back to Resolutions
+            Resoluciones
           </Button>
           <Box display="flex" justifyContent="flex-end" mb={2} gap={2}>
-            {/* Upload PDF button and handler */}
-            {resolution && !resolution.resolved && (
+            {/* Upload PDF button and handler - only for generated resolutions */}
+            {resolution && resolution.generated && (
               <Button variant="contained" color="secondary" onClick={() => setUploadOpen(true)}>
                 Subir PDF
               </Button>
@@ -54,38 +65,55 @@ export default function ShowResolutionPage() {
                 color="primary"
                 onClick={() => navigate(`/resoluciones/${resolution.id}/edit`)}
               >
-                Editar resolución
+                Editar
               </Button>
             )}
+              {resolution && !resolution.resolved && !resolution.generated && canGenerate && (
+                <Button variant="outlined" color="primary" onClick={() => setGenerateConfirmOpen(true)} disabled={generateLoading}>
+                  {generateLoading ? 'Generando...' : 'Generar resolución'}
+                </Button>
+              )}
+                {resolution && resolution.generated && (
+                  <>
+                    <Button variant="outlined" onClick={handlePreview}>
+                      Imprimir
+                    </Button>
+                  </>
+                )}
           </Box>
         </Box>
         {/* Tag/Chip for draft or resolved */}
         {resolution && (
           <Box display="flex" flexDirection="row" justifyContent="flex-end" alignItems="center" mb={2}>
-            <Chip
-              label={
-                <Box display="flex" alignItems="center" gap={0.5}>
-                  {resolution.resolved ? (
-                    <CheckOutlined style={{ fontSize: 16, marginRight: 4 }} />
-                  ) : (
-                    <EditOutlined style={{ fontSize: 16, marginRight: 4 }} />
-                  )}
-                  {resolution.resolved ? "Resuelto" : "Borrador"}
-                </Box>
-              }
-              size="small"
-              sx={{
-                bgcolor: (theme) =>
-                  resolution.resolved
-                    ? theme.palette.success.lighter
-                    : theme.palette.warning.lighter,
-                color: (theme) =>
-                  resolution.resolved
-                    ? theme.palette.success.dark
-                    : theme.palette.warning.dark,
-                fontSize: 14,
-              }}
-            />
+            <Tooltip title={
+              resolution.generated
+                ? 'Generada: número y fecha asignados por el servidor.'
+                : resolution.resolved
+                ? 'Resuelto: la resolución fue emitida.'
+                : 'Borrador: todavía no generada.'
+            }>
+              <span>
+                <Chip
+                  label={resolution.generated ? 'Generada' : resolution.resolved ? 'Resuelto' : 'Borrador'}
+                  size="small"
+                  sx={{
+                    bgcolor: (theme) =>
+                      resolution.generated
+                        ? theme.palette.success.lighter
+                        : resolution.resolved
+                        ? theme.palette.success.lighter
+                        : theme.palette.warning.lighter,
+                    color: (theme) =>
+                      resolution.generated
+                        ? theme.palette.success.dark
+                        : resolution.resolved
+                        ? theme.palette.success.dark
+                        : theme.palette.warning.dark,
+                    fontSize: 14,
+                  }}
+                />
+              </span>
+            </Tooltip>
           </Box>
         )}
         {loading ? (
@@ -98,11 +126,20 @@ export default function ShowResolutionPage() {
             {resolution ? (
               <>
                 <Typography variant="h6" gutterBottom>
-                  Resolution #{resolution.number}
+                  Resolución #{resolution.number}
                 </Typography>
                 <Typography variant="body2" gutterBottom>
-                  <strong>Issued Date:</strong>{' '}
-                  {resolution.issuedDate ? new Date(resolution.issuedDate).toLocaleString() : ''}
+                  <strong>Fecha:</strong>{' '}
+                  {(() => {
+                    try {
+                      if (!resolution.issuedDate) return '';
+                      const d = new Date(resolution.issuedDate);
+                      if (isNaN(d.getTime())) return '';
+                      return d.toLocaleString();
+                    } catch (e) {
+                      return '';
+                    }
+                  })()}
                 </Typography>
                 <Typography variant="body2" gutterBottom>
                   <strong>Resuelto por:</strong>{" "}
@@ -116,11 +153,11 @@ export default function ShowResolutionPage() {
                 </Typography>
                 <Box mt={2}>
                   <Typography variant="subtitle1" gutterBottom>
-                    Content
+                    Contenido
                   </Typography>
                   <div
                     style={{ border: '1px solid #eee', borderRadius: 4, padding: 12, background: '#fafafa' }}
-                    dangerouslySetInnerHTML={{ __html: resolution.content }}
+                    dangerouslySetInnerHTML={{ __html: fixUtf8Mojibake(resolution.content) }}
                   />
                 </Box>
                 {error && (
@@ -185,6 +222,38 @@ export default function ShowResolutionPage() {
                     }
                   }}
                 />
+                {/* Generate confirmation dialog */}
+                <Dialog open={generateConfirmOpen} onClose={() => setGenerateConfirmOpen(false)}>
+                  <DialogTitle>Generar resolución</DialogTitle>
+                  <DialogContent dividers>
+                    <Typography>
+                      Se generará la resolución y se asignará número y fecha de emisión automáticamente. ¿Deseas continuar?
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={() => setGenerateConfirmOpen(false)} disabled={generateLoading}>Cancelar</Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={async () => {
+                        try {
+                          setGenerateLoading(true);
+                          const resp = await dispatch(generateResolution(resolution.id)).unwrap();
+                          // refresh current resolution from returned DTO
+                          // reducers already update state.current on fulfilled
+                        } catch (err) {
+                          enqueueSnackbar(err || 'Error al generar resolución', { variant: 'error' });
+                        } finally {
+                          setGenerateLoading(false);
+                          setGenerateConfirmOpen(false);
+                        }
+                      }}
+                      disabled={generateLoading}
+                    >
+                      {generateLoading ? 'Generando...' : 'Generar'}
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </>
             ) : (
               <Typography>No resolution found.</Typography>

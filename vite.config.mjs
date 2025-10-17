@@ -14,6 +14,16 @@ export default defineConfig(({ mode }) => {
       // this sets a default port to 3000
       port: PORT,
       host: true
+      ,
+      proxy: {
+        // proxy API requests to backend during dev so cookies and auth work as same-origin
+        '/sse-api': {
+          target: 'http://localhost:8091',
+          changeOrigin: true,
+          secure: false,
+          // do not rewrite the path; backend expects /sse-api/...
+        }
+      }
     },
     preview: {
       open: true,

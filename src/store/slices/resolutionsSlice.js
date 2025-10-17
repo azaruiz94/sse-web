@@ -81,11 +81,12 @@ export const fetchResolutionFileUrl = createAsyncThunk(
   }
 );
 
-export const fetchNextResolutionNumber = createAsyncThunk(
-  'resolutions/fetchNextResolutionNumber',
-  async (_, { rejectWithValue }) => {
+// Generate resolution (backend will set number, issuedDate and generated flag)
+export const generateResolution = createAsyncThunk(
+  'resolutions/generateResolution',
+  async (id, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${API_BASE}/next-number`);
+      const response = await api.post(`${API_BASE}/${id}/generate`);
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -117,7 +118,6 @@ const resolutionsSlice = createSlice({
     error: null,
     totalElements: 0,
     fileUrl: null,
-    nextResolutionNumber: null,
     searchResults: []
   },
   reducers: {},
@@ -212,16 +212,22 @@ const resolutionsSlice = createSlice({
         state.error = action.payload;
         state.fileUrl = null;
       })
-      // Fetch next resolution number
-      .addCase(fetchNextResolutionNumber.pending, (state) => {
+      // Generate resolution
+      .addCase(generateResolution.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchNextResolutionNumber.fulfilled, (state, action) => {
+      .addCase(generateResolution.fulfilled, (state, action) => {
         state.loading = false;
-        state.nextResolutionNumber = action.payload;
+        // Backend returns updated ResolutionDTO; update current and list
+        const updated = action.payload;
+        if (updated) {
+          state.current = updated;
+          const idx = state.list.findIndex(r => r.id === updated.id);
+          if (idx !== -1) state.list[idx] = updated;
+        }
       })
-      .addCase(fetchNextResolutionNumber.rejected, (state, action) => {
+      .addCase(generateResolution.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { fetchPendingRecordsByPage } from 'store/slices/recordsSlice';
 import { fetchStates } from 'store/slices/statesSlice';
 import { fetchDependencies } from 'store/slices/dependenciesSlice';
+import Grid from '@mui/material/Grid';
+import MainCard from 'components/MainCard';
 
 export default function PendingRecordsCard() {
   const dispatch = useDispatch();
@@ -117,9 +119,6 @@ export default function PendingRecordsCard() {
   return (
     <Card>
       <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6">Expedientes Pendientes</Typography>
-        </Box>
         {loading || !(states && states.length > 0 && dependencies && dependencies.length > 0) ? (
           <Box display="flex" justifyContent="center" mt={4}>
             <CircularProgress />

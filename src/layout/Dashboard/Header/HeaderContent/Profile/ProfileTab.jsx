@@ -2,7 +2,13 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from 'store/slices/authSlice';
+import { logoutUser } from 'store/slices/authSlice';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 // material-ui
 import List from '@mui/material/List';
@@ -26,37 +32,50 @@ export default function ProfileTab() {
 
   const handleLogout = (event) => {
     setSelectedIndex(4);
-    dispatch(logout());
-    navigate('/login', { replace: true });
+    setConfirmOpen(true);
+  };
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const handleConfirmClose = () => {
+    setConfirmOpen(false);
+  };
+
+  const handleConfirmLogout = () => {
+    dispatch(logoutUser()).finally(() => {
+      setConfirmOpen(false);
+      navigate('/login', { replace: true });
+    });
   };
 
   return (
-    <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32 } }}>
-      <ListItemButton>
+    <>
+      <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32 } }}>
+      {/* <ListItemButton>
         <ListItemIcon>
           <EditOutlined />p 
         </ListItemIcon>
         <ListItemText primary="Edit Profile" />
-      </ListItemButton>
+      </ListItemButton> */}
       <ListItemButton>
         <ListItemIcon>
           <UserOutlined />
         </ListItemIcon>
-        <ListItemText primary="View Profile" />
+        <ListItemText primary="Ver Perfil" />
       </ListItemButton>
 
-      <ListItemButton>
+      {/* <ListItemButton>
         <ListItemIcon>
           <ProfileOutlined />
         </ListItemIcon>
         <ListItemText primary="Social Profile" />
-      </ListItemButton>
-      <ListItemButton>
+      </ListItemButton> */}
+      {/* <ListItemButton>
         <ListItemIcon>
           <WalletOutlined />
         </ListItemIcon>
         <ListItemText primary="Billing" />
-      </ListItemButton>
+      </ListItemButton> */}
       <ListItemButton onClick={handleLogout}>
         <ListItemIcon>
           <LogoutOutlined />
@@ -66,6 +85,17 @@ export default function ProfileTab() {
           selected={selectedIndex === 4} />
       </ListItemButton>
     </List>
+      <Dialog open={confirmOpen} onClose={handleConfirmClose}>
+        <DialogTitle>Confirmar cierre de sesión</DialogTitle>
+        <DialogContent>
+          <DialogContentText>¿Estás seguro de que deseas cerrar sesión?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleConfirmClose}>Cancelar</Button>
+          <Button onClick={handleConfirmLogout} color="primary" variant="contained">Cerrar sesión</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
 

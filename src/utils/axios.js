@@ -1,6 +1,7 @@
 import axios from 'axios';
 const api = axios.create({
-  baseURL: 'http://localhost:8091/sse-api',
+  // Use relative base so dev proxy (vite) can forward to backend and cookies are same-origin
+  baseURL: '/sse-api',
   withCredentials: true // send/receive SESSION cookie
 });
 

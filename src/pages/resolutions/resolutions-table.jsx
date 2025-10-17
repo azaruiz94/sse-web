@@ -15,7 +15,7 @@ import {
   IconButton,
   Chip
 } from '@mui/material';
-import { EyeOutlined, EditOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, CheckOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const ResolutionsTable = forwardRef((props, ref) => {
@@ -69,8 +69,15 @@ const ResolutionsTable = forwardRef((props, ref) => {
       headerName: 'Fecha de emisión',
       width: 180,
       valueFormatter: (params) => {
-        const date = params ? new Date(params) : null;
-        return date ? date.toLocaleDateString() : '';
+        try {
+          const v = params?.value ?? params;
+          if (!v) return '';
+          const date = new Date(v);
+          if (isNaN(date.getTime())) return '';
+          return date.toLocaleDateString();
+        } catch (e) {
+          return '';
+        }
       }
     },
     {
@@ -84,20 +91,40 @@ const ResolutionsTable = forwardRef((props, ref) => {
       headerName: 'Estado',
       width: 120,
       sortable: false,
-      renderCell: (params) =>
-        params.value ? (
-          <Chip
-            label="Resuelto"
-            size="small"
-            sx={{
-              bgcolor: (theme) => theme.palette.success.lighter,
-              color: (theme) => theme.palette.success.dark,
-              fontWeight: 'bold',
-              fontSize: 13,
-              pointerEvents: 'none'
-            }}
-          />
-        ) : (
+      renderCell: (params) => {
+        const row = params.row || {};
+        if (row.resolved) {
+          return (
+            <Chip
+              icon={<CheckOutlined />}
+              label="Resuelta"
+              size="small"
+              sx={{
+                bgcolor: (theme) => theme.palette.success.lighter,
+                color: (theme) => theme.palette.success.dark,
+                fontWeight: 'bold',
+                fontSize: 13,
+                pointerEvents: 'none'
+              }}
+            />
+          );
+        }
+        if (row.generated) {
+          return (
+            <Chip
+              label="Generada"
+              size="small"
+              sx={{
+                bgcolor: (theme) => theme.palette.success.lighter,
+                color: (theme) => theme.palette.success.dark,
+                fontWeight: 'bold',
+                fontSize: 13,
+                pointerEvents: 'none'
+              }}
+            />
+          );
+        }
+        return (
           <Chip
             label="Borrador"
             size="small"
@@ -109,7 +136,8 @@ const ResolutionsTable = forwardRef((props, ref) => {
               pointerEvents: 'none'
             }}
           />
-        )
+        );
+      }
     },
     {
       field: 'recordSummary',
