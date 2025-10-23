@@ -40,7 +40,6 @@ export default function EditResolutionPage() {
 
   const [form, setForm] = useState({
     recordId: '',
-    recordId: '',
     content: '',
     resolvedByDean: true
   });
