@@ -10,7 +10,7 @@ import ErrorRoutes from './ErrorRoutes';
 
 const router = createBrowserRouter(
   [MainRoutes, LoginRoutes, PrintRoutes, ...ErrorRoutes],
-  { basename: import.meta.env.VITE_APP_BASE_NAME }
+  { basename: import.meta.env.VITE_APP_BASE_PATH || '/' }
 );
 
 export default router;
