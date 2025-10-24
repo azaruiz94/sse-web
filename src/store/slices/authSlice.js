@@ -177,6 +177,7 @@ const authSlice = createSlice({
         ) {
           state.error = 'No se pudo conectar con el servidor. Por favor, intente más tarde.';
           state.serverDown = true;
+          state.rehydrated = true; // Always set rehydrated even on connection errors
         } else {
           state.error = action.payload || action.error?.message;
           state.serverDown = false;
