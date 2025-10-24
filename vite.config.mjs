@@ -49,7 +49,8 @@ export default defineConfig(({ mode }) => {
         // },
       ]
     },
-    base: API_URL,
+    // Use /free/ as base path for production deployment under subdirectory
+    base: mode === 'production' ? '/free/' : '/',
     plugins: [react(), jsconfigPaths()]
   };
 });
